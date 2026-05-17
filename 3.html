@@ -2,8 +2,18 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>细胞的一生 —— 造血干细胞生命历程沉浸式探究</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/default.css">
+    <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/index.min.js"></script>
+    <script>
+        // 激活移动端拖拽兼容
+        window.addEventListener('DOMContentLoaded', function() {
+            MobileDragDrop.polyfill({ holdToDrag: 100 }); // 长按 100ms 触发拖拽
+        });
+    </script>
+
     <style>
         /* ================== 全局与底层规范 ================== */
         :root {
@@ -16,8 +26,8 @@
             --glass-border: rgba(255, 255, 255, 0.9);
             --shadow: 0 8px 32px rgba(204, 102, 102, 0.15);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
-        body { width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; background: #fff; color: var(--text-main); }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+        body { width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; background: #fff; color: var(--text-main); touch-action: none; }
 
         /* ================== 顶部固定区域 ================== */
         #header {
@@ -26,15 +36,14 @@
             background: var(--glass-bg); backdrop-filter: blur(10px); z-index: 20; border-bottom: 1px solid var(--glass-border);
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        #main-title { font-size: 22px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; letter-spacing: 1px; }
+        #main-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; letter-spacing: 1px; text-align: center; padding: 0 10px; }
         #progress-container { width: 85%; max-width: 1200px; height: 8px; background: rgba(200,200,200,0.3); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(to right, #FFE6E6, #FFB3B3, #CC6666); transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(204, 102, 102, 0.5); }
-        #prompt-text { font-size: 15px; color: var(--text-sub); text-align: center; max-width: 90%; font-weight: 500; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(to right, #FFE6E6, #FFB3B3, #CC6666); transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #prompt-text { font-size: 14px; color: var(--text-sub); text-align: center; max-width: 95%; font-weight: 500; }
 
         /* ================== 中央主交互区域 ================== */
         #main-stage {
-            flex: 1 1 auto;
-            position: relative; background: var(--marrow-bg); transition: background 1.5s ease;
+            flex: 1 1 auto; position: relative; background: var(--marrow-bg); transition: background 1.5s ease;
             display: flex; justify-content: center; align-items: center; overflow: hidden;
             background-size: 200% 200%; animation: bg-breathe 10s ease infinite;
         }
@@ -42,111 +51,96 @@
         .level-container { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.5s ease; }
         .level-container.active { display: flex; opacity: 1; }
 
-        .organic-cell {
-            box-shadow: inset -15px -15px 30px rgba(204,102,102,0.1), inset 10px 10px 20px rgba(255,255,255,0.8), 0 15px 35px rgba(204,102,102,0.2);
-        }
+        .organic-cell { box-shadow: inset -15px -15px 30px rgba(204,102,102,0.1), inset 10px 10px 20px rgba(255,255,255,0.8), 0 15px 35px rgba(204,102,102,0.2); }
 
         /* ================== 底部操作与反馈区域 ================== */
         #footer {
-            flex: 0 0 auto; min-height: 18vh; padding: 20px 15px;
+            flex: 0 0 auto; min-height: 20vh; padding: 15px;
             display: flex; justify-content: center; align-items: center; flex-direction: column;
             background: #fdfdfd; border-top: 1px solid #eee; position: relative; z-index: 20;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
         }
-        #controls-area { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center; width: 100%; max-width: 1400px; }
+        #controls-area { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; width: 100%; max-width: 1400px; }
 
         .btn-primary {
-            padding: 10px 28px; font-size: 15px; font-weight: bold; color: white; background: linear-gradient(135deg, #FFB3B3, #CC6666);
-            border: none; border-radius: 20px; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(204, 102, 102, 0.3); white-space: nowrap;
+            padding: 10px 24px; font-size: 15px; font-weight: bold; color: white; background: linear-gradient(135deg, #FFB3B3, #CC6666);
+            border: none; border-radius: 20px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 10px rgba(204, 102, 102, 0.3);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(204, 102, 102, 0.4); }
-        #next-btn { display: none; position: absolute; right: 3%; bottom: 25px; }
+        #next-btn { display: none; position: absolute; right: 5%; bottom: 15px; }
 
         /* ================== 弹窗规范 ================== */
-        .modal { display: none; position: absolute; top: 12%; left: 50%; transform: translateX(-50%); padding: 20px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 100; max-width: 50%; text-align: left; line-height: 1.6; font-size: 15px; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal { display: none; position: absolute; top: 12%; left: 50%; transform: translateX(-50%); padding: 20px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 100; width: 85%; max-width: 450px; text-align: left; line-height: 1.6; font-size: 14px; animation: popIn 0.3s; }
         @keyframes popIn { 0% { opacity: 0; transform: translate(-50%, -20px) scale(0.95); } 100% { opacity: 1; transform: translate(-50%, 0) scale(1); } }
         .modal-success { background: #F5F5DC; color: #3A2318; border: 2px solid #e0d8c0; }
         .modal-error { background: #FFE4B5; color: #8b4500; border: 2px solid #eebb77; }
-        .modal-close { margin-top: 15px; padding: 6px 18px; cursor: pointer; border: none; background: rgba(0,0,0,0.1); border-radius: 20px; float: right; font-weight: bold; transition: background 0.3s; }
-        .modal-close:hover { background: rgba(0,0,0,0.2); color:white; }
+        .modal-close { margin-top: 10px; padding: 6px 15px; cursor: pointer; border: none; background: rgba(0,0,0,0.1); border-radius: 20px; float: right; font-weight: bold; }
 
         /* ================== 各关卡控件样式 ================== */
-
         /* 关卡1 */
-        .drag-card { padding: 10px 20px; background: white; border: 2px solid #ffcccc; border-radius: 8px; cursor: grab; font-weight: bold; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-        .drop-slot { width: 100px; height: 50px; border: 2px dashed #b38888; background: rgba(255,255,255,0.4); border-radius: 8px; display: flex; justify-content: center; align-items: center; margin: 0 8px; }
+        .drag-card { padding: 8px 16px; background: white; border: 2px solid #ffcccc; border-radius: 8px; cursor: grab; font-weight: bold; color: var(--primary); font-size:14px; }
+        .drop-slot { width: 80px; height: 40px; border: 2px dashed #b38888; background: rgba(255,255,255,0.4); border-radius: 8px; display: flex; justify-content: center; align-items: center; margin: 0 5px; }
 
         /* 关卡2：有丝分裂精密核心 */
-        #cell-mitosis { width: 340px; height: 340px; border: 4px solid rgba(204,102,102,0.4); border-radius: 50%; position: relative; background: radial-gradient(circle, #fff, #ffe6e6); transition: all 1.2s ease-in-out; }
-
-        #nucleus { width: 180px; height: 180px; border: 3px dashed rgba(100,100,150,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(220,230,255,0.5); transition: opacity 1.2s ease; cursor: pointer; z-index: 2; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(255,255,255,0.8); }
-        #nucleolus { width: 40px; height: 40px; background: rgba(100,100,150,0.8); border-radius: 50%; }
-
-        #chromatin { width: 120px; height: 120px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20,50 Q40,20 60,50 T80,50 Q60,80 40,50 T20,50 M30,30 Q70,70 40,80" stroke="%234A90E2" fill="transparent" stroke-width="3" stroke-linecap="round"/></svg>') center/contain no-repeat; cursor: pointer; transition: transform 1.5s, opacity 1.5s; }
-
-        .chromosome, .chromatid { width: 40px; height: 40px; position: absolute; display: none; z-index: 5; cursor: grab; transform: translate(-50%, -50%); }
-        .chromosome { background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M25,15 L50,50 L25,85 M75,15 L50,50 L75,85" stroke="%23D0021B" fill="transparent" stroke-width="12" stroke-linecap="round"/><circle cx="50" cy="50" r="12" fill="%234A90E2"/></svg>') center/contain no-repeat; filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2)); }
+        #cell-mitosis { width: 280px; height: 280px; border: 4px solid rgba(204,102,102,0.4); border-radius: 50%; position: relative; background: radial-gradient(circle, #fff, #ffe6e6); transition: all 1.2s ease-in-out; }
+        #nucleus { width: 140px; height: 140px; border: 3px dashed rgba(100,100,150,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(220,230,255,0.5); transition: opacity 1.2s ease; cursor: pointer; z-index: 2; display: flex; justify-content: center; align-items: center; }
+        #nucleolus { width: 30px; height: 30px; background: rgba(100,100,150,0.8); border-radius: 50%; }
+        #chromatin { width: 90px; height: 90px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20,50 Q40,20 60,50 T80,50 Q60,80 40,50 T20,50 M30,30 Q70,70 40,80" stroke="%234A90E2" fill="transparent" stroke-width="3" stroke-linecap="round"/></svg>') center/contain no-repeat; cursor: pointer; transition: transform 1.5s, opacity 1.5s; }
+        .chromosome, .chromatid { width: 35px; height: 35px; position: absolute; display: none; z-index: 5; cursor: grab; transform: translate(-50%, -50%); }
+        .chromosome { background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M25,15 L50,50 L25,85 M75,15 L50,50 L75,85" stroke="%23D0021B" fill="transparent" stroke-width="12" stroke-linecap="round"/><circle cx="50" cy="50" r="12" fill="%234A90E2"/></svg>') center/contain no-repeat; }
         .chromatid { background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M25,15 L50,50 L25,85" stroke="%23D0021B" fill="transparent" stroke-width="12" stroke-linecap="round"/><circle cx="50" cy="50" r="10" fill="%234A90E2"/></svg>') center/contain no-repeat; }
         .chromatid.right { transform: translate(-50%, -50%) scaleX(-1); }
-
         .centrosome { width: 28px; height: 28px; background: radial-gradient(circle, #4A90E2, #003366); border-radius: 50%; position: absolute; cursor: grab; display: flex; justify-content: center; align-items: center; color: white; font-size: 10px; font-weight: bold; border: 2px solid #fff; z-index: 10; transform: translate(-50%, -50%); }
-
         #equator { width: 100%; height: 2px; background: repeating-linear-gradient(to right, transparent, transparent 6px, rgba(100,100,100,0.5) 6px, rgba(100,100,100,0.5) 12px); position: absolute; top: 50%; left: 0; transform: translateY(-50%); display: none; z-index: 0; }
-
         #spindle-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 1s; }
         .spindle-line { stroke: #eebb77; stroke-width: 2; stroke-dasharray: 4,4; opacity: 0.7; }
-
-        .cleavage-handle { width: 40px; height: 20px; background: var(--primary); border-radius: 10px; position: absolute; left: 50%; transform: translateX(-50%); display: none; z-index: 20; cursor: ns-resize; box-shadow: 0 2px 5px rgba(0,0,0,0.3); color:white; font-size:12px; text-align:center; line-height:20px;}
-        #cleavage-top { top: -10px; } #cleavage-bottom { bottom: -10px; }
-
+        .cleavage-handle { width: 50px; height: 30px; background: var(--primary); border-radius: 15px; position: absolute; left: 50%; transform: translateX(-50%); display: none; z-index: 20; cursor: ns-resize; box-shadow: 0 2px 5px rgba(0,0,0,0.3); color:white; font-size:12px; text-align:center; line-height:30px;}
+        #cleavage-top { top: -15px; } #cleavage-bottom { bottom: -15px; }
         .pole-click { width: 80px; height: 80px; position: absolute; top: 50%; transform: translateY(-50%); border-radius: 50%; cursor: pointer; display: none; z-index: 30; border: 2px dashed #4A90E2; background: rgba(74, 144, 226, 0.1); }
-        #pole-left { left: 10%; } #pole-right { right: 10%; }
+        #pole-left { left: 5%; } #pole-right { right: 5%; }
 
-        /* 关卡3/4/5 保持紧凑原样 */
-        .gene-panel { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px; border-radius: 12px; }
+        /* 关卡3/4/5 */
+        .gene-panel { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 10px; border-radius: 12px; }
         .custom-cb { display: none; }
-        .cb-label { padding: 8px 16px; font-size: 14px; background: white; border: 2px solid #f0d0d0; border-radius: 8px; cursor: pointer; color: #666; font-weight:600; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .cb-label { padding: 8px 12px; font-size: 13px; background: white; border: 2px solid #f0d0d0; border-radius: 8px; cursor: pointer; color: #666; font-weight:600;}
         .custom-cb:checked + .cb-label { background: #ffebeb; border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
-        .rbc-cell { width: 200px; height: 200px; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); border-radius: 50%; transition: all 2s ease-in-out; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .rbc-cell { width: 180px; height: 180px; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); border-radius: 50%; transition: all 2s ease-in-out; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 16px; }
 
-        #senescence-stage { display: flex; width: 90%; justify-content: center; align-items: center; gap: 40px; height: 100%; }
-        .cell-zone { width: 260px; min-height: 320px; border: 2px dashed rgba(204,102,102,0.4); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; background: var(--glass-bg); backdrop-filter: blur(5px); }
-        .zone-title { background: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; color: var(--text-sub); margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-        .feature-card { padding: 8px 12px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; margin: 4px 0; font-size: 13px; cursor: grab; width: 100%; text-align: center; font-weight: 500; color: #444; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        #senescence-stage { display: flex; width: 100%; justify-content: center; align-items: center; gap: 10px; height: 100%; padding: 0 10px; }
+        .cell-zone { width: 48%; min-height: 250px; border: 2px dashed rgba(204,102,102,0.4); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; background: var(--glass-bg); }
+        .zone-title { background: white; padding: 4px 8px; border-radius: 20px; font-weight: bold; font-size: 12px; color: var(--text-sub); margin-bottom: 10px; text-align: center;}
+        .feature-card { padding: 6px 10px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; margin: 4px 0; font-size: 12px; cursor: grab; width: 100%; text-align: center; font-weight: 500; color: #444; }
 
-        .slider-panel { display: flex; flex-direction: column; gap: 15px; width: 320px; padding: 20px; }
+        .slider-panel { display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 320px; padding: 15px; }
         .slider-row { display: flex; flex-direction: column; gap: 6px; }
-        .slider-label { font-size: 14px; font-weight: bold; color: var(--text-sub); display: flex; justify-content: space-between; }
+        .slider-label { font-size: 13px; font-weight: bold; color: var(--text-sub); display: flex; justify-content: space-between; }
         .val-badge { background: #eee; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
-        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; margin-top: -7px; box-shadow: 0 2px 6px rgba(204,102,102,0.4); border: 2px solid white; }
-        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(0,0,0,0.1); border-radius: 3px; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; height: 30px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--primary); margin-top: -9px; box-shadow: 0 2px 6px rgba(204,102,102,0.4); border: 2px solid white; }
+        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; }
     </style>
 </head>
 <body>
 
     <div id="header">
-        <div id="main-title">细胞的一生 —— 造血干细胞生命历程沉浸式探究</div>
+        <div id="main-title">细胞的一生沉浸式探究</div>
         <div id="progress-container"><div id="progress-bar"></div></div>
         <div id="prompt-text">加载中...</div>
     </div>
 
     <div id="main-stage">
         <div id="ai-modal" class="modal modal-error">
-            <strong style="color: #d32f2f; font-size: 16px;">🔬 【AI 实时精细化解析】</strong>
+            <strong style="color: #d32f2f; font-size: 15px;">🔬 【AI 实时精细化解析】</strong>
             <div id="ai-msg" style="margin-top: 8px;"></div>
-            <button class="modal-close" onclick="closeModal('ai-modal')">确认并重试</button>
+            <button class="modal-close" onclick="closeModal('ai-modal')">重试</button>
         </div>
         <div id="success-modal" class="modal modal-success">
-            <strong style="color: #2e7d32; font-size: 16px;">💡 【知识点解析】</strong>
+            <strong style="color: #2e7d32; font-size: 15px;">💡 【知识点解析】</strong>
             <div id="success-msg" style="margin-top: 8px;"></div>
             <button class="modal-close" onclick="closeModal('success-modal')">关闭</button>
         </div>
 
         <div id="level-1" class="level-container active">
-            <div class="organic-cell" style="width: 200px; height: 200px; border: 3px solid rgba(150,150,150,0.2); background: radial-gradient(circle, #fff, #ffe6e6); border-radius:50%; display:flex; justify-content:center; align-items:center;">
-                <div style="width: 100px; height: 100px; border: 2px dashed rgba(100,100,150,0.5); border-radius: 50%; background:rgba(220,230,255,0.4); display:flex; justify-content:center; align-items:center; font-weight:bold; color:#777;">间期细胞</div>
+            <div class="organic-cell" style="width: 150px; height: 150px; border: 3px solid rgba(150,150,150,0.2); background: radial-gradient(circle, #fff, #ffe6e6); border-radius:50%; display:flex; justify-content:center; align-items:center;">
+                <div style="width: 80px; height: 80px; border: 2px dashed rgba(100,100,150,0.5); border-radius: 50%; background:rgba(220,230,255,0.4); display:flex; justify-content:center; align-items:center; font-weight:bold; color:#777; font-size:12px;">间期细胞</div>
             </div>
         </div>
 
@@ -154,7 +148,6 @@
             <div id="cell-mitosis" class="organic-cell">
                 <div id="equator"></div>
                 <svg id="spindle-svg"></svg>
-
                 <div id="nucleus"><div id="nucleolus"></div></div>
                 <div id="chromatin"></div>
 
@@ -180,38 +173,39 @@
         </div>
 
         <div id="level-3" class="level-container"><div class="rbc-cell organic-cell" id="diff-cell" style="background: radial-gradient(circle, #fff, #ffe6e6); color:#777; border:3px solid rgba(150,150,150,0.2); box-shadow:none;">造血干细胞</div></div>
+
         <div id="level-4" class="level-container">
             <div id="senescence-stage">
                 <div class="cell-zone" id="zone-stem" ondragover="allowDrop(event)" ondrop="dropFeature(event, 'stem')">
                     <div class="zone-title">有核造血干细胞</div>
-                    <div class="organic-cell" style="width: 80px; height: 80px; border: 3px solid rgba(150,150,150,0.2); background: radial-gradient(circle, #fff, #ffe6e6); border-radius:50%; margin-bottom: 10px; display:flex; justify-content:center; align-items:center;"><div style="width: 35px; height: 35px; border: 2px dashed rgba(100,100,150,0.5); border-radius: 50%; background:rgba(220,230,255,0.4);"></div></div>
+                    <div class="organic-cell" style="width: 60px; height: 60px; border: 2px solid rgba(150,150,150,0.2); background: radial-gradient(circle, #fff, #ffe6e6); border-radius:50%; margin-bottom: 5px; display:flex; justify-content:center; align-items:center;"><div style="width: 25px; height: 25px; border: 1px dashed rgba(100,100,150,0.5); border-radius: 50%; background:rgba(220,230,255,0.4);"></div></div>
                 </div>
                 <div class="cell-zone" id="zone-rbc" ondragover="allowDrop(event)" ondrop="dropFeature(event, 'rbc')">
                     <div class="zone-title">无核成熟红细胞</div>
-                    <div class="organic-cell" style="width: 80px; height: 80px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); margin-bottom: 10px; box-shadow: inset 0 0 30px #922b21;"></div>
+                    <div class="organic-cell" style="width: 60px; height: 60px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); margin-bottom: 5px; box-shadow: inset 0 0 20px #922b21;"></div>
                 </div>
             </div>
         </div>
+
         <div id="level-5" class="level-container">
             <div class="rbc-cell organic-cell" id="death-cell" style="transition: all 1s; box-shadow: inset 0 0 30px #922b21;">衰老红细胞</div>
-            <div id="death-suspense" style="display:none; position:absolute; top:10%; color:var(--text-main); font-weight:bold; background:var(--glass-bg); padding:10px 20px; border-radius:20px; box-shadow:var(--shadow);">⚠️ 细胞未启动正常凋亡程序，机体免疫监视机制启动。</div>
+            <div id="death-suspense" style="display:none; position:absolute; top:5%; color:var(--text-main); font-weight:bold; background:var(--glass-bg); padding:10px; border-radius:10px; font-size:12px; max-width:90%; text-align:center;">⚠️ 细胞未启动正常凋亡程序，机体免疫监视启动。</div>
         </div>
     </div>
 
     <div id="footer">
         <div id="controls-area"></div>
-        <button id="next-btn" class="btn-primary" onclick="nextLevel()">进入下一关 ➔</button>
+        <button id="next-btn" class="btn-primary" onclick="nextLevel()">进入下一关</button>
     </div>
 
     <script>
-        // ================== 全局控制 ==================
         let currentLevel = 1;
         const prompts = [
-            "你是骨髓中新生的造血干细胞，请凭借所学知识，将时期卡片拖拽至正确的生理顺序卡槽中。",
-            "间期物质准备完毕，你将启动有丝分裂，需严格按照细胞真实生理顺序，分步完成结构操作，确保亲子代细胞遗传物质均等分配。",
-            "你需要从造血干细胞特化为成熟红细胞，请勾选维持细胞存活和实现红细胞功能所需表达的基因！",
-            "成熟红细胞和造血干细胞都会走向衰老，请将下方衰老特征拖拽至对应的细胞区域。",
-            "最终的生命结局由自身凋亡基因和外界环境共同决定，请滑动滑块探索不同的归宿。"
+            "你是骨髓中新生的造血干细胞，请长按拖拽时期卡片至正确的生理顺序卡槽中。",
+            "准备完毕，启动有丝分裂。严格按生理顺序，点击或拖拽细胞结构。",
+            "需特化为成熟红细胞，请勾选生存和红细胞功能所需表达的基因！",
+            "都会走向衰老，请长按并拖拽下方衰老特征至对应的细胞区域。",
+            "生命结局由基因和环境决定，请滑动滑块探索不同的归宿。"
         ];
 
         function setProgress(percent) { document.getElementById('progress-bar').style.width = percent + '%'; }
@@ -240,16 +234,9 @@
             if(currentLevel === 4) initL4();
             if(currentLevel === 5) initL5();
         }
+        function nextLevel() { if (currentLevel < 5) { setProgress(currentLevel * 20); currentLevel++; initLevel(); } }
 
-        function nextLevel() {
-            if (currentLevel < 5) {
-                setProgress(currentLevel * 20);
-                currentLevel++;
-                initLevel();
-            }
-        }
-
-        // ================= 第1/3/4/5关 逻辑精简保留 =================
+        // ================= 第1/3/4/5关 逻辑 =================
         function allowDrop(ev) { ev.preventDefault(); }
         function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
         function dropL1(ev) { ev.preventDefault(); ev.currentTarget.appendChild(document.getElementById(ev.dataTransfer.getData("text"))); }
@@ -257,8 +244,8 @@
 
         function initL1() {
             document.getElementById('controls-area').innerHTML = `
-                <div style="display:flex; gap:15px; align-items:center;">
-                    <div style="display:flex; align-items:center;" id="slots"><div class="drop-slot" ondragover="allowDrop(event)" ondrop="dropL1(event)"></div> ➔ <div class="drop-slot" ondragover="allowDrop(event)" ondrop="dropL1(event)"></div> ➔ <div class="drop-slot" ondragover="allowDrop(event)" ondrop="dropL1(event)"></div></div>
+                <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+                    <div style="display:flex; align-items:center;" id="slots"><div class="drop-slot" ondragover="allowDrop(event)" ondrop="dropL1(event)"></div> <span style="color:#999; margin:0 3px;">➔</span> <div class="drop-slot" ondragover="allowDrop(event)" ondrop="dropL1(event)"></div> <span style="color:#999; margin:0 3px;">➔</span> <div class="drop-slot" ondragover="allowDrop(event)" ondrop="dropL1(event)"></div></div>
                     <div style="display:flex; gap:10px;" id="cards"><div class="drag-card" draggable="true" ondragstart="drag(event)" id="card-G2">G₂期</div><div class="drag-card" draggable="true" ondragstart="drag(event)" id="card-S">S期</div><div class="drag-card" draggable="true" ondragstart="drag(event)" id="card-G1">G₁期</div></div>
                     <button class="btn-primary" onclick="checkL1()">确认验证</button>
                 </div>`;
@@ -266,22 +253,27 @@
         function checkL1() {
             let order = [];
             document.querySelectorAll('#slots .drop-slot').forEach(s => { if(s.firstChild) order.push(s.firstChild.id); });
-            if(order.length < 3) return showAIError("操作错误：未完成所有阶段排序。");
-            if(order.join(',') === 'card-G1,card-S,card-G2') showSuccess("完全正确！G₁ → S → G₂。");
-            else { initL1(); showAIError("操作错误：时序颠倒会导致 DNA 复制异常！"); }
+            if(order.length < 3) return showAIError("操作错误：未完成排序。");
+
+            // 加入完整详尽的知识点提示
+            if(order.join(',') === 'card-G1,card-S,card-G2') {
+                showSuccess("分裂间期是细胞分裂的物质准备阶段，严格遵循 <strong>G₁ → S → G₂</strong> 的生理顺序：<br><br>① <strong>G₁期</strong>：细胞快速生长，合成 DNA 复制、中心体复制所需的酶、核苷酸等原料，储备能量；<br>② <strong>S 期</strong>：完成细胞核 DNA 半保留复制，动物细胞中心体同步由 1 个复制为 2 个；<br>③ <strong>G₂期</strong>：合成纺锤体相关蛋白，检测 DNA、中心体复制是否完好，为分裂期做最后准备。");
+            } else {
+                initL1();
+                showAIError("操作错误：时序颠倒会导致 DNA 复制异常！");
+            }
         }
 
         function initL3() {
             document.getElementById('controls-area').innerHTML = `
                 <div class="gene-panel" id="genes">
                     <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">呼吸酶基因</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="i"><div class="cb-label">肌动蛋白基因</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">ATP合成酶基因</div></label>
+                    <label><input type="checkbox" class="custom-cb" value="i"><div class="cb-label">肌动蛋白</div></label>
+                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">ATP合成酶</div></label>
                     <label><input type="checkbox" class="custom-cb" value="l"><div class="cb-label">血红蛋白基因</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">核糖体蛋白基因</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="i"><div class="cb-label">胰岛素基因</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="l"><div class="cb-label">血红素合成基因</div></label>
-                </div><button class="btn-primary" onclick="checkL3()">执行分化</button>`;
+                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">核糖体蛋白</div></label>
+                    <label><input type="checkbox" class="custom-cb" value="l"><div class="cb-label">血红素合成</div></label>
+                </div><button class="btn-primary" onclick="checkL3()" style="margin-top:10px;">执行分化</button>`;
         }
         function checkL3() {
             let h=0, l=0, i=0;
@@ -290,7 +282,7 @@
                 document.getElementById('diff-cell').innerText = "成熟红细胞(无核)";
                 document.getElementById('diff-cell').style.background = 'radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b)';
                 document.getElementById('diff-cell').style.boxShadow = 'inset 0 0 40px #922b21';
-                showSuccess("特化成功！");
+                showSuccess("特化成功！管家基因维持生命，奢侈基因实现特定功能。");
             } else {
                 document.querySelectorAll('#genes input').forEach(cb => cb.checked = false);
                 if(h<3) showAIError("遗漏管家基因！细胞死亡。"); else if(i>0) showAIError("误选无关基因！异常分化。"); else showAIError("未充分表达奢侈基因。");
@@ -298,22 +290,22 @@
         }
 
         function initL4() {
-            document.getElementById('controls-area').innerHTML = `<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;" id="l4cards"><div class="feature-card" id="f1" draggable="true" ondragstart="drag(event)">萎缩</div><div class="feature-card" id="f2" draggable="true" ondragstart="drag(event)">代谢慢</div><div class="feature-card" id="f3" draggable="true" ondragstart="drag(event)">膜改变</div><div class="feature-card" id="f4" draggable="true" ondragstart="drag(event)">核膜内折</div><div class="feature-card" id="f5" draggable="true" ondragstart="drag(event)">遗传不稳</div><div class="feature-card" id="f6" draggable="true" ondragstart="drag(event)">色素积累</div><div class="feature-card" id="f7" draggable="true" ondragstart="drag(event)">携氧弱</div></div><button class="btn-primary" onclick="checkL4()">验证</button>`;
-            document.getElementById('zone-stem').innerHTML = '<div class="zone-title">有核造血干细胞</div><div class="organic-cell" style="width: 80px; height: 80px; border-radius:50%; border: 3px solid rgba(150,150,150,0.2); background: radial-gradient(circle, #fff, #ffe6e6); margin-bottom: 10px; display:flex; justify-content:center; align-items:center;"><div style="width: 35px; height: 35px; border: 2px dashed rgba(100,100,150,0.5); border-radius: 50%; background:rgba(220,230,255,0.4);"></div></div>';
-            document.getElementById('zone-rbc').innerHTML = '<div class="zone-title">无核成熟红细胞</div><div class="organic-cell" style="width: 80px; height: 80px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); margin-bottom: 10px; box-shadow: inset 0 0 30px #922b21;"></div>';
+            document.getElementById('controls-area').innerHTML = `<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px;" id="l4cards"><div class="feature-card" id="f1" draggable="true" ondragstart="drag(event)">萎缩</div><div class="feature-card" id="f2" draggable="true" ondragstart="drag(event)">代谢慢</div><div class="feature-card" id="f3" draggable="true" ondragstart="drag(event)">膜通透改变</div><div class="feature-card" id="f4" draggable="true" ondragstart="drag(event)">核膜内折</div><div class="feature-card" id="f5" draggable="true" ondragstart="drag(event)">遗传不稳</div><div class="feature-card" id="f6" draggable="true" ondragstart="drag(event)">色素积累</div><div class="feature-card" id="f7" draggable="true" ondragstart="drag(event)">携氧减弱</div></div><button class="btn-primary" onclick="checkL4()" style="margin-top:5px;">验证分类</button>`;
+            document.getElementById('zone-stem').innerHTML = '<div class="zone-title">有核造血干细胞</div><div class="organic-cell" style="width: 60px; height: 60px; border-radius:50%; border: 3px solid rgba(150,150,150,0.2); background: radial-gradient(circle, #fff, #ffe6e6); margin-bottom: 5px; display:flex; justify-content:center; align-items:center;"><div style="width: 25px; height: 25px; border: 1px dashed rgba(100,100,150,0.5); border-radius: 50%; background:rgba(220,230,255,0.4);"></div></div>';
+            document.getElementById('zone-rbc').innerHTML = '<div class="zone-title">无核成熟红细胞</div><div class="organic-cell" style="width: 60px; height: 60px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); margin-bottom: 5px; box-shadow: inset 0 0 20px #922b21;"></div>';
         }
         function checkL4() {
             let rIds = Array.from(document.getElementById('zone-rbc').querySelectorAll('.feature-card')).map(e=>e.id);
             let sIds = Array.from(document.getElementById('zone-stem').querySelectorAll('.feature-card')).map(e=>e.id);
             if(rIds.includes('f4')||rIds.includes('f5')||rIds.includes('f6')) { initL4(); showAIError("成熟红细胞无核！不能有核膜内折等特征。"); return;}
-            if(sIds.includes('f7')) { initL4(); showAIError("造血干细胞不表达血红蛋白。"); return;}
+            if(sIds.includes('f7')) { initL4(); showAIError("干细胞不表达血红蛋白。"); return;}
             if((sIds.includes('f4')||sIds.includes('f5')) && rIds.includes('f7')) showSuccess("分类正确！"); else { initL4(); showAIError("请分类所有卡片。"); }
         }
 
         let cA=false, cB=false;
         function initL5() {
             document.getElementById('controls-area').innerHTML = `<div class="slider-panel"><label class="slider-label">凋亡基因 <span id="v1" class="val-badge">低</span></label><input type="range" id="g-slider" min="0" max="100" value="0" oninput="updL5()"><label class="slider-label">不利环境 <span id="v2" class="val-badge">弱</span></label><input type="range" id="e-slider" min="0" max="100" value="0" oninput="updL5()"></div>`;
-            document.getElementById('death-cell').style = "width:200px; height:200px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); transition:all 1s; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold;";
+            document.getElementById('death-cell').style = "width:180px; height:180px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); transition:all 1s; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold;";
             document.getElementById('death-suspense').style.display='none';
         }
         function updL5() {
@@ -328,11 +320,8 @@
             if(cA&&cB) setTimeout(()=>{ document.getElementById('progress-bar').style.width='100%'; document.getElementById('controls-area').innerHTML="<h3 style='color:green'>通关！</h3>"; },2000);
         }
 
-
-        // ================= 第2关：核心物理引擎与逻辑 =================
+        // ================= 第2关：移动端兼容与全自由物理引擎 =================
         let l2_state = 'pro_1';
-        /* 状态流转: pro_1(等核点击) -> pro_2(等染色质点击) -> pro_3(等中心体拖拽+点击) -> meta(等染色体拖拽对齐) -> ana_click(等着丝粒分裂) -> ana_drag(等单体拖向两极) -> telo(等膜拖拽+极点击) */
-
         let dragCtx = { el: null, isDragging: false, startX: 0, startY: 0, origLeft: 0, origTop: 0 };
         const mitosisBox = document.getElementById('cell-mitosis');
 
@@ -344,34 +333,31 @@
             document.getElementById('spindle-svg').style.opacity = 0; document.getElementById('spindle-svg').innerHTML = '';
             document.getElementById('equator').style.display = 'none';
             document.querySelectorAll('.cleavage-handle, .pole-click').forEach(el => el.style.display = 'none');
-            mitosisBox.style.borderRadius = '50%'; mitosisBox.style.width = '340px';
+            mitosisBox.style.borderRadius = '50%'; mitosisBox.style.width = '280px';
 
-            // 重置中心体
             document.getElementById('cen1').style.left = '30%'; document.getElementById('cen1').style.top = '30%'; document.getElementById('cen1').dataset.ready = '0';
             document.getElementById('cen2').style.left = '70%'; document.getElementById('cen2').style.top = '70%'; document.getElementById('cen2').dataset.ready = '0';
 
-            // 重置染色体初始乱序分布
             document.getElementById('chr1').style.left = '35%'; document.getElementById('chr1').style.top = '35%'; document.getElementById('chr1').dataset.locked = '0';
             document.getElementById('chr2').style.left = '65%'; document.getElementById('chr2').style.top = '40%'; document.getElementById('chr2').dataset.locked = '0';
             document.getElementById('chr3').style.left = '40%'; document.getElementById('chr3').style.top = '65%'; document.getElementById('chr3').dataset.locked = '0';
             document.getElementById('chr4').style.left = '60%'; document.getElementById('chr4').style.top = '60%'; document.getElementById('chr4').dataset.locked = '0';
 
-            // 重置单体
             for(let i=1; i<=4; i++) {
                 document.getElementById(`chrm${i}_l`).dataset.locked = '0';
                 document.getElementById(`chrm${i}_r`).dataset.locked = '0';
             }
 
-            document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px; box-shadow:var(--shadow); color:#666; font-weight:bold;">🔬 当前阶段：前期 (第一步)。请在上方细胞内点击目标结构。</div>`;
+            document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; color:#666; font-size:13px; font-weight:bold; text-align:center;">当前阶段：前期 (第1步)。请点击细胞内的目标结构。</div>`;
         }
 
-        // --- 鼠标拖拽通用事件 ---
-        document.addEventListener('mousedown', (e) => {
+        function getEventPos(e) { return e.touches ? e.touches[0] : e; }
+
+        function handleDragStart(e) {
             if(currentLevel !== 2) return;
             const el = e.target.closest('.draggable');
             if(!el) return;
 
-            // 拦截违规拖拽
             let type = el.dataset.type;
             if(l2_state === 'pro_1' || l2_state === 'pro_2') {
                 if(type === 'cen') return showAIError("操作错误：核膜未完全解体或染色体未形成，不可提前移动中心体！\n后果：导致纺锤体形成时序错乱。");
@@ -379,38 +365,40 @@
             }
             if(l2_state === 'pro_3' && type === 'chr') return showAIError("操作错误：中心体未就位并形成纺锤体，染色体缺乏牵引轨道，不可移动！");
             if(l2_state === 'meta' && type === 'chrm') return showAIError("操作错误：着丝粒尚未分裂，不能硬拖染色单体！");
-            if(l2_state === 'ana_click' && type === 'chr') return showAIError("操作错误：到了后期，必须先点击着丝粒使其分裂，不能直接硬拖整条染色体！");
+            if(l2_state === 'ana_click' && type === 'chr') return showAIError("后期必须先点击着丝粒使其分裂，不能硬拖！");
 
-            if(type === 'cen' && l2_state !== 'pro_3') return; // 只在pro_3可拖中心体
-            if(type === 'chr' && l2_state !== 'meta') return;  // 只在meta可拖染色体
-            if(type === 'chrm' && l2_state !== 'ana_drag') return; // 只在ana_drag可拖单体
-            if(type === 'cleavage' && l2_state !== 'telo') return; // 只在telo可拖膜
+            if(type === 'cen' && l2_state !== 'pro_3') return;
+            if(type === 'chr' && l2_state !== 'meta') return;
+            if(type === 'chrm' && l2_state !== 'ana_drag') return;
+            if(type === 'cleavage' && l2_state !== 'telo') return;
 
-            e.preventDefault();
+            if(e.type === 'touchstart') e.preventDefault();
+
             dragCtx.el = el; dragCtx.isDragging = true;
-            dragCtx.startX = e.clientX; dragCtx.startY = e.clientY;
+            let pos = getEventPos(e);
+            dragCtx.startX = pos.clientX; dragCtx.startY = pos.clientY;
             dragCtx.origLeft = parseFloat(el.style.left) || 50;
             dragCtx.origTop = parseFloat(el.style.top) || 50;
-        });
+        }
 
-        document.addEventListener('mousemove', (e) => {
+        function handleDragMove(e) {
             if(!dragCtx.isDragging || !dragCtx.el) return;
-            const rect = mitosisBox.getBoundingClientRect();
-            let dx = ((e.clientX - dragCtx.startX) / rect.width) * 100;
-            let dy = ((e.clientY - dragCtx.startY) / rect.height) * 100;
+            if(e.type === 'touchmove') e.preventDefault();
 
-            // 如果拖的是缢裂点，只能上下拖
+            let pos = getEventPos(e);
+            const rect = mitosisBox.getBoundingClientRect();
+            let dx = ((pos.clientX - dragCtx.startX) / rect.width) * 100;
+            let dy = ((pos.clientY - dragCtx.startY) / rect.height) * 100;
+
             if(dragCtx.el.dataset.type === 'cleavage') {
                 let newTop = dragCtx.origTop + dy;
-                // 限制柄的拖动范围
                 if(dragCtx.el.id === 'cleavage-top') newTop = Math.max(-5, Math.min(45, newTop));
                 if(dragCtx.el.id === 'cleavage-bottom') newTop = Math.max(55, Math.min(105, newTop));
                 dragCtx.el.style.top = newTop + '%';
 
-                // 动态形变
                 let tTop = parseFloat(document.getElementById('cleavage-top').style.top) || -5;
                 let bTop = parseFloat(document.getElementById('cleavage-bottom').style.top) || 105;
-                let distance = bTop - tTop; // 110 到 ~10
+                let distance = bTop - tTop;
                 let radiusX = 50 + (110 - distance);
                 mitosisBox.style.borderRadius = `${radiusX}px / 50%`;
                 return;
@@ -418,21 +406,20 @@
 
             dragCtx.el.style.left = (dragCtx.origLeft + dx) + '%';
             dragCtx.el.style.top = (dragCtx.origTop + dy) + '%';
-        });
+        }
 
-        document.addEventListener('mouseup', (e) => {
+        function handleDragEnd(e) {
             if(!dragCtx.isDragging || !dragCtx.el) return;
             let el = dragCtx.el;
             dragCtx.isDragging = false; dragCtx.el = null;
 
             let x = parseFloat(el.style.left), y = parseFloat(el.style.top);
 
-            // 1. 中心体拖拽判定 (pro_3)
             if(l2_state === 'pro_3' && el.dataset.type === 'cen') {
                 if(x < 20) { el.style.left = '10%'; el.style.top = '50%'; el.dataset.ready = '1'; }
                 else if(x > 80) { el.style.left = '90%'; el.style.top = '50%'; el.dataset.ready = '1'; }
                 else {
-                    showAIError("错误操作：中心体位置偏移！\n生理要求：必须移向细胞的左右对称两极。");
+                    showAIError("中心体位置偏移！必须移向细胞的左右对称两极。");
                     el.style.left = dragCtx.origLeft + '%'; el.style.top = dragCtx.origTop + '%';
                 }
 
@@ -440,49 +427,40 @@
                 if(c1.dataset.ready === '1' && c2.dataset.ready === '1') {
                     if(c1.style.left === c2.style.left) {
                         c1.dataset.ready='0'; c2.dataset.ready='0';
-                        showAIError("错误操作：两个中心体处于同极！\n生理后果：将导致无法形成对称纺锤体，染色体分离失败。");
+                        showAIError("两个中心体处于同极！将导致无法形成对称纺锤体。");
                     } else {
-                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px;">🔬 请分别点击两极中心体，生成星射线。</div>`;
+                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 请分别点击两极中心体，生成星射线。</div>`;
                     }
                 }
             }
 
-            // 2. 染色体中期排列 (meta)
             if(l2_state === 'meta' && el.dataset.type === 'chr') {
                 if(y >= 45 && y <= 55) {
                     el.style.top = '50%'; el.dataset.locked = '1';
-                    // 检查是否堆叠 (简单检查x距离)
                     let chrs = document.querySelectorAll('.chromosome');
                     for(let c of chrs) {
-                        if(c.id !== el.id && c.dataset.locked === '1' && Math.abs(parseFloat(c.style.left) - x) < 10) {
-                            el.dataset.locked = '0';
-                            el.style.top = dragCtx.origTop + '%';
-                            return showAIError("错误操作：染色体发生堆叠！\n生理要求：中期染色体的着丝粒必须单独、均匀地排列在赤道板上。");
+                        if(c.id !== el.id && c.dataset.locked === '1' && Math.abs(parseFloat(c.style.left) - x) < 12) {
+                            el.dataset.locked = '0'; el.style.top = dragCtx.origTop + '%';
+                            return showAIError("染色体发生堆叠！中期染色体必须单独、均匀地排列在赤道板上。");
                         }
                     }
                 } else {
                     el.dataset.locked = '0';
-                    showAIError("错误操作：着丝粒偏移！\n生理要求：需精准对齐细胞中央的赤道板。");
+                    showAIError("着丝粒偏移！需精准对齐细胞中央的赤道板。");
                 }
-                // 检查是否全满
                 if(document.querySelectorAll('.chromosome[data-locked="1"]').length === 4) {
                     l2_state = 'ana_click';
-                    document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px;">🔬 进入后期：请逐个点击着丝粒，使其分裂。</div>`;
+                    document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 后期：请点击染色体中央的着丝粒使其分裂。</div>`;
                 }
             }
 
-            // 3. 染色单体分离 (ana_drag)
             if(l2_state === 'ana_drag' && el.dataset.type === 'chrm') {
                 if(x < 30) { el.style.left = '20%'; el.dataset.locked = '1'; }
                 else if(x > 70) { el.style.left = '80%'; el.dataset.locked = '1'; }
-                else {
-                    el.dataset.locked = '0';
-                    showAIError("错误操作：牵拉力度不足，未到达两极！");
-                }
+                else { el.dataset.locked = '0'; showAIError("牵拉力度不足，未到达两极！"); }
 
                 let lockedList = document.querySelectorAll('.chromatid[data-locked="1"]');
                 if(lockedList.length === 8) {
-                    // 检查两极数量是否均匀
                     let leftC = 0, rightC = 0;
                     lockedList.forEach(c => { if(parseFloat(c.style.left) < 50) leftC++; else rightC++; });
                     if(leftC === 4 && rightC === 4) {
@@ -491,52 +469,49 @@
                         document.getElementById('spindle-svg').style.opacity = 0;
                         document.getElementById('cleavage-top').style.display = 'block';
                         document.getElementById('cleavage-bottom').style.display = 'block';
-                        document.getElementById('cleavage-top').style.top = '-5%';
-                        document.getElementById('cleavage-bottom').style.top = '105%';
-                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px;">🔬 进入末期：拖拽上下两端的控制块，将细胞膜向内对称缢裂。</div>`;
+                        document.getElementById('cleavage-top').style.top = '-5%'; document.getElementById('cleavage-bottom').style.top = '105%';
+                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 末期：拖拽上下把手，将细胞膜向内对称缢裂。</div>`;
                     } else {
-                        // 重置
                         document.querySelectorAll('.chromatid').forEach(c => c.dataset.locked = '0');
-                        showAIError("错误操作：两极染色体数量不均等（发生畸变）！\n生理后果：子细胞将发生染色体数目变异（如非整倍体）。");
+                        showAIError("两极染色体数量不均等！子细胞将发生染色体数目变异。");
                     }
                 }
             }
 
-            // 4. 末期细胞缢裂 (telo)
             if(l2_state === 'telo' && el.dataset.type === 'cleavage') {
                 let tTop = parseFloat(document.getElementById('cleavage-top').style.top) || -5;
                 let bTop = parseFloat(document.getElementById('cleavage-bottom').style.top) || 105;
 
-                // 检查偏心：例如上面拖到了 40%，下面还是 105%，差值极大说明不对称
-                let tDiff = Math.abs(tTop - 50);
-                let bDiff = Math.abs(bTop - 50);
-                if(Math.abs(tDiff - bDiff) > 20) {
-                    showAIError("错误操作：细胞膜缢裂严重偏心！\n生理要求：动物细胞分裂必须从正中间向内对称缢裂。");
+                if(Math.abs(Math.abs(tTop - 50) - Math.abs(bTop - 50)) > 20) {
+                    showAIError("细胞膜缢裂严重偏心！动物细胞分裂必须从正中间向内对称缢裂。");
                     document.getElementById('cleavage-top').style.top = '-5%'; document.getElementById('cleavage-bottom').style.top = '105%';
                     mitosisBox.style.borderRadius = '50%';
                     return;
                 }
 
-                if(tTop >= 40 && bTop <= 60) {
-                    document.getElementById('cleavage-top').style.display = 'none';
-                    document.getElementById('cleavage-bottom').style.display = 'none';
-                    mitosisBox.style.borderRadius = '160px / 60px';
-                    mitosisBox.style.width = '420px';
-                    document.getElementById('pole-left').style.display = 'block';
-                    document.getElementById('pole-right').style.display = 'block';
-                    document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px;">🔬 最后一步：点击左右两极，重建子细胞核膜核仁。</div>`;
+                if(tTop >= 35 && bTop <= 65) {
+                    document.getElementById('cleavage-top').style.display = 'none'; document.getElementById('cleavage-bottom').style.display = 'none';
+                    mitosisBox.style.borderRadius = '120px / 50px'; mitosisBox.style.width = '320px';
+                    document.getElementById('pole-left').style.display = 'block'; document.getElementById('pole-right').style.display = 'block';
+                    document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 最后一步：点击左右两极区域，重建细胞核。</div>`;
                 }
             }
-        });
+        }
 
-        // --- 点击事件 ---
+        document.addEventListener('mousedown', handleDragStart);
+        document.addEventListener('touchstart', handleDragStart, {passive: false});
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('touchmove', handleDragMove, {passive: false});
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchend', handleDragEnd);
+
         document.getElementById('nucleus').onclick = () => {
             if(l2_state === 'pro_1') {
                 document.getElementById('nucleus').style.opacity = 0;
                 setTimeout(() => document.getElementById('nucleus').style.display = 'none', 1200);
                 l2_state = 'pro_2';
-                document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px;">🔬 前期 (第二步)：点击细胞质内散开的丝状染色质。</div>`;
-            } else { showAIError("操作错误：核膜已解体。"); }
+                document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 前期 (第2步)：点击细胞内散开的染色质。</div>`;
+            } else { showAIError("核膜已解体。"); }
         };
 
         document.getElementById('chromatin').onclick = () => {
@@ -548,13 +523,10 @@
                     document.querySelectorAll('.chromosome').forEach(c => c.style.display = 'block');
                 }, 1500);
                 l2_state = 'pro_3';
-                document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px;">🔬 前期 (第三步)：将两个中心体拖至细胞左右两极。</div>`;
-            } else if (l2_state === 'pro_1') {
-                showAIError("错误操作：未解体核膜直接点击染色质！\n后果：染色质被核膜包裹，无法散开形成染色体。");
-            }
+                document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 前期 (第3步)：将中心体拖至左右两极。</div>`;
+            } else if (l2_state === 'pro_1') { showAIError("未解体核膜直接点击！染色质被核膜包裹无法散开。"); }
         };
 
-        // 生成星射线
         let spindleClick = 0;
         document.querySelectorAll('.centrosome').forEach(cen => {
             cen.onclick = () => {
@@ -564,21 +536,20 @@
                         let svg = document.getElementById('spindle-svg');
                         svg.innerHTML = `
                             <line x1="10%" y1="50%" x2="90%" y2="50%" class="spindle-line" />
-                            <line x1="10%" y1="50%" x2="50%" y2="30%" class="spindle-line" />
-                            <line x1="10%" y1="50%" x2="50%" y2="70%" class="spindle-line" />
-                            <line x1="90%" y1="50%" x2="50%" y2="30%" class="spindle-line" />
-                            <line x1="90%" y1="50%" x2="50%" y2="70%" class="spindle-line" />
+                            <line x1="10%" y1="50%" x2="50%" y2="25%" class="spindle-line" />
+                            <line x1="10%" y1="50%" x2="50%" y2="75%" class="spindle-line" />
+                            <line x1="90%" y1="50%" x2="50%" y2="25%" class="spindle-line" />
+                            <line x1="90%" y1="50%" x2="50%" y2="75%" class="spindle-line" />
                         `;
                         svg.style.opacity = 1;
                         document.getElementById('equator').style.display = 'block';
                         l2_state = 'meta';
-                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px;">🔬 进入中期：逐条拖拽染色体，将着丝粒精准对齐赤道板。</div>`;
+                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 中期：拖拽染色体，对齐赤道板。</div>`;
                     }
                 }
             }
         });
 
-        // 后期点击着丝粒分裂
         let splitCount = 0;
         document.querySelectorAll('.chromosome').forEach(chr => {
             chr.onclick = () => {
@@ -593,21 +564,20 @@
                     splitCount++;
                     if(splitCount === 4) {
                         l2_state = 'ana_drag';
-                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 20px; border-radius:20px;">🔬 后期：拖动分开的 8 条染色单体，均匀分配向两极。</div>`;
+                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 后期：拖动分离的染色单体，均匀分向两极。</div>`;
                     }
                 }
             }
         });
 
-        // 末期重建细胞核
         let poleClicks = 0;
         document.querySelectorAll('.pole-click').forEach(pole => {
             pole.onclick = () => {
                 pole.style.display = 'none';
                 let div = document.createElement('div');
-                div.style.cssText = `position:absolute; width:80px; height:80px; border:2px dashed rgba(100,100,150,0.6); border-radius:50%; background:rgba(220,230,255,0.5); top:50%; transform:translateY(-50%); display:flex; justify-content:center; align-items:center;`;
+                div.style.cssText = `position:absolute; width:60px; height:60px; border:2px dashed rgba(100,100,150,0.6); border-radius:50%; background:rgba(220,230,255,0.5); top:50%; transform:translateY(-50%); display:flex; justify-content:center; align-items:center; z-index:15;`;
                 div.style.left = pole.id === 'pole-left' ? '15%' : '65%';
-                div.innerHTML = `<div style="width:20px; height:20px; background:rgba(100,100,150,0.8); border-radius:50%;"></div>`;
+                div.innerHTML = `<div style="width:15px; height:15px; background:rgba(100,100,150,0.8); border-radius:50%;"></div>`;
                 mitosisBox.appendChild(div);
 
                 document.querySelectorAll('.chromatid').forEach(c => {
@@ -617,12 +587,11 @@
 
                 poleClicks++;
                 if(poleClicks === 2) {
-                    showSuccess("操作完全正确！亲子代细胞的遗传物质实现了均等分配，有丝分裂圆满完成。");
+                    showSuccess("完全正确！亲子代细胞遗传物质实现均等分配。");
                 }
             }
         });
 
-        // 初始化游戏
         initLevel();
     </script>
 </body>
