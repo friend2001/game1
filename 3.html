@@ -8,9 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/default.css">
     <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/index.min.js"></script>
     <script>
-        // 激活移动端拖拽兼容
         window.addEventListener('DOMContentLoaded', function() {
-            MobileDragDrop.polyfill({ holdToDrag: 100 }); // 长按 100ms 触发拖拽
+            MobileDragDrop.polyfill({ holdToDrag: 100 });
         });
     </script>
 
@@ -39,7 +38,7 @@
         #main-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; letter-spacing: 1px; text-align: center; padding: 0 10px; }
         #progress-container { width: 85%; max-width: 1200px; height: 8px; background: rgba(200,200,200,0.3); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(to right, #FFE6E6, #FFB3B3, #CC6666); transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        #prompt-text { font-size: 14px; color: var(--text-sub); text-align: center; max-width: 95%; font-weight: 500; }
+        #prompt-text { font-size: 14px; color: var(--text-sub); text-align: center; max-width: 95%; font-weight: 500; line-height:1.5; }
 
         /* ================== 中央主交互区域 ================== */
         #main-stage {
@@ -79,7 +78,7 @@
         .drag-card { padding: 8px 16px; background: white; border: 2px solid #ffcccc; border-radius: 8px; cursor: grab; font-weight: bold; color: var(--primary); font-size:14px; }
         .drop-slot { width: 80px; height: 40px; border: 2px dashed #b38888; background: rgba(255,255,255,0.4); border-radius: 8px; display: flex; justify-content: center; align-items: center; margin: 0 5px; }
 
-        /* 关卡2：有丝分裂精密核心 */
+        /* 关卡2 */
         #cell-mitosis { width: 280px; height: 280px; border: 4px solid rgba(204,102,102,0.4); border-radius: 50%; position: relative; background: radial-gradient(circle, #fff, #ffe6e6); transition: all 1.2s ease-in-out; }
         #nucleus { width: 140px; height: 140px; border: 3px dashed rgba(100,100,150,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(220,230,255,0.5); transition: opacity 1.2s ease; cursor: pointer; z-index: 2; display: flex; justify-content: center; align-items: center; }
         #nucleolus { width: 30px; height: 30px; background: rgba(100,100,150,0.8); border-radius: 50%; }
@@ -97,18 +96,29 @@
         .pole-click { width: 80px; height: 80px; position: absolute; top: 50%; transform: translateY(-50%); border-radius: 50%; cursor: pointer; display: none; z-index: 30; border: 2px dashed #4A90E2; background: rgba(74, 144, 226, 0.1); }
         #pole-left { left: 5%; } #pole-right { right: 5%; }
 
-        /* 关卡3/4/5 */
+        /* 关卡3 */
         .gene-panel { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 10px; border-radius: 12px; }
         .custom-cb { display: none; }
         .cb-label { padding: 8px 12px; font-size: 13px; background: white; border: 2px solid #f0d0d0; border-radius: 8px; cursor: pointer; color: #666; font-weight:600;}
         .custom-cb:checked + .cb-label { background: #ffebeb; border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
         .rbc-cell { width: 180px; height: 180px; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); border-radius: 50%; transition: all 2s ease-in-out; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 16px; }
 
-        #senescence-stage { display: flex; width: 100%; justify-content: center; align-items: center; gap: 10px; height: 100%; padding: 0 10px; }
-        .cell-zone { width: 48%; min-height: 250px; border: 2px dashed rgba(204,102,102,0.4); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; background: var(--glass-bg); }
-        .zone-title { background: white; padding: 4px 8px; border-radius: 20px; font-weight: bold; font-size: 12px; color: var(--text-sub); margin-bottom: 10px; text-align: center;}
-        .feature-card { padding: 6px 10px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; margin: 4px 0; font-size: 12px; cursor: grab; width: 100%; text-align: center; font-weight: 500; color: #444; }
+        /* 关卡4：韦恩图专属样式 */
+        #venn-diagram { position: relative; width: 500px; height: 280px; margin: 0 auto; max-width: 100%; transform: scale(0.95); }
+        .venn-circle { position: absolute; width: 260px; height: 260px; border-radius: 50%; border: 3px dashed rgba(204, 102, 102, 0.5); z-index: 1; pointer-events: none; transition: all 1s; }
+        #circle-stem { left: 0; background: rgba(255, 240, 240, 0.5); }
+        #circle-rbc { right: 0; background: rgba(255, 230, 230, 0.5); }
+        .venn-label-wrapper { position: absolute; top: 10px; width: 100%; text-align: center; }
+        .venn-label { display: inline-block; font-weight: bold; font-size: 13px; color: var(--text-sub); background: white; padding: 4px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); pointer-events: auto; }
 
+        .drop-zone { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 10; gap: 4px; border-radius: 10px; padding: 5px; }
+        #zone-stem-only { width: 130px; height: 180px; left: 10px; top: 60px; }
+        #zone-common { width: 120px; height: 180px; left: 190px; top: 60px; border-radius: 50px; background: rgba(255,255,255,0.4); border: 2px dashed rgba(204,102,102,0.6); padding: 10px 5px; justify-content: center; }
+        #zone-rbc-only { width: 130px; height: 180px; right: 10px; top: 60px; }
+
+        .feature-card { padding: 4px 6px; background: white; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 11px; cursor: grab; width: 100%; text-align: center; font-weight: 500; color: #444; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* 关卡5 */
         .slider-panel { display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 320px; padding: 15px; }
         .slider-row { display: flex; flex-direction: column; gap: 6px; }
         .slider-label { font-size: 13px; font-weight: bold; color: var(--text-sub); display: flex; justify-content: space-between; }
@@ -116,12 +126,16 @@
         input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; height: 30px; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--primary); margin-top: -9px; box-shadow: 0 2px 6px rgba(204,102,102,0.4); border: 2px solid white; }
         input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; }
+
+        /* 结算报告面板 */
+        #report-panel { display:none; background:var(--glass-bg); padding:30px; border-radius:15px; text-align:center; max-width:800px; width:90%; z-index:100; box-shadow:var(--shadow); border:1px solid var(--glass-border); overflow-y: auto; max-height: 90vh; }
+        .draggable { cursor: grab; }
     </style>
 </head>
 <body>
 
     <div id="header">
-        <div id="main-title">细胞的一生沉浸式探究</div>
+        <div id="main-title">细胞的一生 —— 造血干细胞生命历程沉浸式探究</div>
         <div id="progress-container"><div id="progress-bar"></div></div>
         <div id="prompt-text">加载中...</div>
     </div>
@@ -130,7 +144,7 @@
         <div id="ai-modal" class="modal modal-error">
             <strong style="color: #d32f2f; font-size: 15px;">🔬 【AI 实时精细化解析】</strong>
             <div id="ai-msg" style="margin-top: 8px;"></div>
-            <button class="modal-close" onclick="closeModal('ai-modal')">重试</button>
+            <button class="modal-close" onclick="closeModal('ai-modal')">确认</button>
         </div>
         <div id="success-modal" class="modal modal-success">
             <strong style="color: #2e7d32; font-size: 15px;">💡 【知识点解析】</strong>
@@ -175,22 +189,26 @@
         <div id="level-3" class="level-container"><div class="rbc-cell organic-cell" id="diff-cell" style="background: radial-gradient(circle, #fff, #ffe6e6); color:#777; border:3px solid rgba(150,150,150,0.2); box-shadow:none;">造血干细胞</div></div>
 
         <div id="level-4" class="level-container">
-            <div id="senescence-stage">
-                <div class="cell-zone" id="zone-stem" ondragover="allowDrop(event)" ondrop="dropFeature(event, 'stem')">
-                    <div class="zone-title">有核造血干细胞</div>
-                    <div class="organic-cell" style="width: 60px; height: 60px; border: 2px solid rgba(150,150,150,0.2); background: radial-gradient(circle, #fff, #ffe6e6); border-radius:50%; margin-bottom: 5px; display:flex; justify-content:center; align-items:center;"><div style="width: 25px; height: 25px; border: 1px dashed rgba(100,100,150,0.5); border-radius: 50%; background:rgba(220,230,255,0.4);"></div></div>
+            <div id="venn-diagram">
+                <div class="venn-circle" id="circle-stem">
+                    <div class="venn-label-wrapper"><span class="venn-label">有核造血干细胞</span></div>
                 </div>
-                <div class="cell-zone" id="zone-rbc" ondragover="allowDrop(event)" ondrop="dropFeature(event, 'rbc')">
-                    <div class="zone-title">无核成熟红细胞</div>
-                    <div class="organic-cell" style="width: 60px; height: 60px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); margin-bottom: 5px; box-shadow: inset 0 0 20px #922b21;"></div>
+                <div class="venn-circle" id="circle-rbc">
+                    <div class="venn-label-wrapper"><span class="venn-label">无核成熟红细胞</span></div>
                 </div>
+
+                <div class="drop-zone" id="zone-stem-only" ondragover="allowDrop(event)" ondrop="dropToZone(event)"></div>
+                <div class="drop-zone" id="zone-common" ondragover="allowDrop(event)" ondrop="dropToZone(event)"></div>
+                <div class="drop-zone" id="zone-rbc-only" ondragover="allowDrop(event)" ondrop="dropToZone(event)"></div>
             </div>
         </div>
 
         <div id="level-5" class="level-container">
             <div class="rbc-cell organic-cell" id="death-cell" style="transition: all 1s; box-shadow: inset 0 0 30px #922b21;">衰老红细胞</div>
-            <div id="death-suspense" style="display:none; position:absolute; top:5%; color:var(--text-main); font-weight:bold; background:var(--glass-bg); padding:10px; border-radius:10px; font-size:12px; max-width:90%; text-align:center;">⚠️ 细胞未启动正常凋亡程序，机体免疫监视启动。</div>
+            <div id="death-suspense" style="display:none; position:absolute; top:5%; color:var(--text-main); font-weight:bold; background:var(--glass-bg); padding:10px; border-radius:10px; font-size:12px; max-width:90%; text-align:center;">⚠️ 细胞未启动正常凋亡程序，机体免疫监视机制启动，相关知识将在免疫章节深入探究。</div>
         </div>
+
+        <div id="report-panel"></div>
     </div>
 
     <div id="footer">
@@ -199,17 +217,24 @@
     </div>
 
     <script>
+        // ================== 全局核心机制与错题记录 ==================
         let currentLevel = 1;
+        // 使用整数记录各关卡错题次数，用于最终称号判定
+        let errorStats = { L1: 0, L2: 0, L3: 0, L4: 0, L5: 0 };
+
         const prompts = [
-            "你是骨髓中新生的造血干细胞，请长按拖拽时期卡片至正确的生理顺序卡槽中。",
-            "准备完毕，启动有丝分裂。严格按生理顺序，点击或拖拽细胞结构。",
-            "需特化为成熟红细胞，请勾选生存和红细胞功能所需表达的基因！",
-            "都会走向衰老，请长按并拖拽下方衰老特征至对应的细胞区域。",
-            "生命结局由基因和环境决定，请滑动滑块探索不同的归宿。"
+            "你是骨髓中新生的造血干细胞，分裂前需依次完成三个间期阶段的物质准备，请凭借所学知识，将时期卡片拖拽至正确的生理顺序卡槽中。",
+            "间期物质准备完毕，你将启动有丝分裂，需严格按照细胞真实生理顺序，分步完成结构操作，确保亲子代细胞遗传物质均等分配。",
+            "你需要从造血干细胞特化为成熟红细胞，请勾选维持细胞存活和实现红细胞功能所需表达的基因！",
+            "成熟红细胞和造血干细胞都会走向衰老，二者结构不同，特征存在差异。请将特征拖拽至上方韦恩图的对应区域。",
+            "你已完成生命使命进入衰老阶段，最终的生命结局，由自身凋亡基因和外界环境共同决定，请滑动滑块，探索不同的生命归宿。"
         ];
 
         function setProgress(percent) { document.getElementById('progress-bar').style.width = percent + '%'; }
-        function showAIError(msg) {
+
+        // 调用AI报错并记录错题
+        function showAIError(msg, levelId) {
+            if(levelId) errorStats[levelId]++;
             document.getElementById('ai-msg').innerHTML = msg.replace(/\n/g, '<br>');
             document.getElementById('ai-modal').style.display = 'block';
         }
@@ -236,11 +261,10 @@
         }
         function nextLevel() { if (currentLevel < 5) { setProgress(currentLevel * 20); currentLevel++; initLevel(); } }
 
-        // ================= 第1/3/4/5关 逻辑 =================
+        // ================= 第1关：间期 =================
         function allowDrop(ev) { ev.preventDefault(); }
         function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
         function dropL1(ev) { ev.preventDefault(); ev.currentTarget.appendChild(document.getElementById(ev.dataTransfer.getData("text"))); }
-        function dropFeature(ev, t) { ev.preventDefault(); ev.currentTarget.appendChild(document.getElementById(ev.dataTransfer.getData("text"))); }
 
         function initL1() {
             document.getElementById('controls-area').innerHTML = `
@@ -253,74 +277,17 @@
         function checkL1() {
             let order = [];
             document.querySelectorAll('#slots .drop-slot').forEach(s => { if(s.firstChild) order.push(s.firstChild.id); });
-            if(order.length < 3) return showAIError("操作错误：未完成排序。");
+            if(order.length < 3) return showAIError("错误操作：未完成所有阶段排序。\n后果：导致造血干细胞无法进入分裂期。", "L1");
 
-            // 加入完整详尽的知识点提示
             if(order.join(',') === 'card-G1,card-S,card-G2') {
                 showSuccess("分裂间期是细胞分裂的物质准备阶段，严格遵循 <strong>G₁ → S → G₂</strong> 的生理顺序：<br><br>① <strong>G₁期</strong>：细胞快速生长，合成 DNA 复制、中心体复制所需的酶、核苷酸等原料，储备能量；<br>② <strong>S 期</strong>：完成细胞核 DNA 半保留复制，动物细胞中心体同步由 1 个复制为 2 个；<br>③ <strong>G₂期</strong>：合成纺锤体相关蛋白，检测 DNA、中心体复制是否完好，为分裂期做最后准备。");
             } else {
                 initL1();
-                showAIError("操作错误：时序颠倒会导致 DNA 复制异常！");
+                showAIError("错误操作：间期排序颠倒。\n细胞内部变化：时序错乱导致无法进行DNA复制或检测。\n生理后果：造血干细胞增殖异常，子代细胞遗传物质受损！", "L1");
             }
         }
 
-        function initL3() {
-            document.getElementById('controls-area').innerHTML = `
-                <div class="gene-panel" id="genes">
-                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">呼吸酶基因</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="i"><div class="cb-label">肌动蛋白</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">ATP合成酶</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="l"><div class="cb-label">血红蛋白基因</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">核糖体蛋白</div></label>
-                    <label><input type="checkbox" class="custom-cb" value="l"><div class="cb-label">血红素合成</div></label>
-                </div><button class="btn-primary" onclick="checkL3()" style="margin-top:10px;">执行分化</button>`;
-        }
-        function checkL3() {
-            let h=0, l=0, i=0;
-            document.querySelectorAll('#genes input:checked').forEach(cb => { if(cb.value=='h')h++; if(cb.value=='l')l++; if(cb.value=='i')i++; });
-            if(h==3 && l==2 && i==0) {
-                document.getElementById('diff-cell').innerText = "成熟红细胞(无核)";
-                document.getElementById('diff-cell').style.background = 'radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b)';
-                document.getElementById('diff-cell').style.boxShadow = 'inset 0 0 40px #922b21';
-                showSuccess("特化成功！管家基因维持生命，奢侈基因实现特定功能。");
-            } else {
-                document.querySelectorAll('#genes input').forEach(cb => cb.checked = false);
-                if(h<3) showAIError("遗漏管家基因！细胞死亡。"); else if(i>0) showAIError("误选无关基因！异常分化。"); else showAIError("未充分表达奢侈基因。");
-            }
-        }
-
-        function initL4() {
-            document.getElementById('controls-area').innerHTML = `<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px;" id="l4cards"><div class="feature-card" id="f1" draggable="true" ondragstart="drag(event)">萎缩</div><div class="feature-card" id="f2" draggable="true" ondragstart="drag(event)">代谢慢</div><div class="feature-card" id="f3" draggable="true" ondragstart="drag(event)">膜通透改变</div><div class="feature-card" id="f4" draggable="true" ondragstart="drag(event)">核膜内折</div><div class="feature-card" id="f5" draggable="true" ondragstart="drag(event)">遗传不稳</div><div class="feature-card" id="f6" draggable="true" ondragstart="drag(event)">色素积累</div><div class="feature-card" id="f7" draggable="true" ondragstart="drag(event)">携氧减弱</div></div><button class="btn-primary" onclick="checkL4()" style="margin-top:5px;">验证分类</button>`;
-            document.getElementById('zone-stem').innerHTML = '<div class="zone-title">有核造血干细胞</div><div class="organic-cell" style="width: 60px; height: 60px; border-radius:50%; border: 3px solid rgba(150,150,150,0.2); background: radial-gradient(circle, #fff, #ffe6e6); margin-bottom: 5px; display:flex; justify-content:center; align-items:center;"><div style="width: 25px; height: 25px; border: 1px dashed rgba(100,100,150,0.5); border-radius: 50%; background:rgba(220,230,255,0.4);"></div></div>';
-            document.getElementById('zone-rbc').innerHTML = '<div class="zone-title">无核成熟红细胞</div><div class="organic-cell" style="width: 60px; height: 60px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); margin-bottom: 5px; box-shadow: inset 0 0 20px #922b21;"></div>';
-        }
-        function checkL4() {
-            let rIds = Array.from(document.getElementById('zone-rbc').querySelectorAll('.feature-card')).map(e=>e.id);
-            let sIds = Array.from(document.getElementById('zone-stem').querySelectorAll('.feature-card')).map(e=>e.id);
-            if(rIds.includes('f4')||rIds.includes('f5')||rIds.includes('f6')) { initL4(); showAIError("成熟红细胞无核！不能有核膜内折等特征。"); return;}
-            if(sIds.includes('f7')) { initL4(); showAIError("干细胞不表达血红蛋白。"); return;}
-            if((sIds.includes('f4')||sIds.includes('f5')) && rIds.includes('f7')) showSuccess("分类正确！"); else { initL4(); showAIError("请分类所有卡片。"); }
-        }
-
-        let cA=false, cB=false;
-        function initL5() {
-            document.getElementById('controls-area').innerHTML = `<div class="slider-panel"><label class="slider-label">凋亡基因 <span id="v1" class="val-badge">低</span></label><input type="range" id="g-slider" min="0" max="100" value="0" oninput="updL5()"><label class="slider-label">不利环境 <span id="v2" class="val-badge">弱</span></label><input type="range" id="e-slider" min="0" max="100" value="0" oninput="updL5()"></div>`;
-            document.getElementById('death-cell').style = "width:180px; height:180px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); transition:all 1s; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold;";
-            document.getElementById('death-suspense').style.display='none';
-        }
-        function updL5() {
-            let g = parseInt(document.getElementById('g-slider').value), e = parseInt(document.getElementById('e-slider').value);
-            let c = document.getElementById('death-cell');
-            document.getElementById('v1').innerText = g>50?"高":"低"; document.getElementById('v2').innerText = e>50?"强":"弱";
-            document.getElementById('death-suspense').style.display='none';
-            if(e<50 && g>50) { c.style.transform="scale(0.1)"; c.style.opacity=0; setTimeout(()=>showAIError("生理性自然凋亡，维持稳态。"),100); cA=true; }
-            else if(e<50 && g<=50) { c.style.transform="scale(1)"; c.style.opacity=1; document.getElementById('death-suspense').style.display='block'; }
-            else if(e>=50 && g>50) { c.style.transform="scale(1.1)"; c.style.background="#555"; setTimeout(()=>showAIError("凋亡通路被环境强行中断。"),100); }
-            else if(e>=50 && g<=50) { c.style.transform="scale(1.6)"; c.style.opacity=0; setTimeout(()=>showAIError("细胞瞬时破裂坏死！引发炎症。"),100); cB=true; }
-            if(cA&&cB) setTimeout(()=>{ document.getElementById('progress-bar').style.width='100%'; document.getElementById('controls-area').innerHTML="<h3 style='color:green'>通关！</h3>"; },2000);
-        }
-
-        // ================= 第2关：移动端兼容与全自由物理引擎 =================
+        // ================= 第2关：有丝分裂物理引擎 =================
         let l2_state = 'pro_1';
         let dragCtx = { el: null, isDragging: false, startX: 0, startY: 0, origLeft: 0, origTop: 0 };
         const mitosisBox = document.getElementById('cell-mitosis');
@@ -348,24 +315,23 @@
                 document.getElementById(`chrm${i}_r`).dataset.locked = '0';
             }
 
-            document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; color:#666; font-size:13px; font-weight:bold; text-align:center;">当前阶段：前期 (第1步)。请点击细胞内的目标结构。</div>`;
+            document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; color:#666; font-size:13px; font-weight:bold; text-align:center;">第一步：点击细胞核解体核膜。</div>`;
         }
 
         function getEventPos(e) { return e.touches ? e.touches[0] : e; }
-
         function handleDragStart(e) {
             if(currentLevel !== 2) return;
             const el = e.target.closest('.draggable');
             if(!el) return;
-
             let type = el.dataset.type;
+
             if(l2_state === 'pro_1' || l2_state === 'pro_2') {
-                if(type === 'cen') return showAIError("操作错误：核膜未完全解体或染色体未形成，不可提前移动中心体！\n后果：导致纺锤体形成时序错乱。");
-                if(type === 'chr') return showAIError("操作错误：核膜未解体，染色体被包裹无法移动！");
+                if(type === 'cen') return showAIError("操作错误：核膜未完全解体或染色体未形成，不可提前移动中心体！\n后果：导致纺锤体形成时序错乱。", "L2");
+                if(type === 'chr') return showAIError("操作错误：核膜未解体，染色体被包裹无法移动！", "L2");
             }
-            if(l2_state === 'pro_3' && type === 'chr') return showAIError("操作错误：中心体未就位并形成纺锤体，染色体缺乏牵引轨道，不可移动！");
-            if(l2_state === 'meta' && type === 'chrm') return showAIError("操作错误：着丝粒尚未分裂，不能硬拖染色单体！");
-            if(l2_state === 'ana_click' && type === 'chr') return showAIError("后期必须先点击着丝粒使其分裂，不能硬拖！");
+            if(l2_state === 'pro_3' && type === 'chr') return showAIError("操作错误：中心体未就位并形成纺锤体，染色体缺乏牵引轨道，不可移动！", "L2");
+            if(l2_state === 'meta' && type === 'chrm') return showAIError("操作错误：着丝粒尚未分裂，不能硬拖染色单体！", "L2");
+            if(l2_state === 'ana_click' && type === 'chr') return showAIError("操作错误：直接硬拖！到了后期，必须先点击着丝粒使其分裂。", "L2");
 
             if(type === 'cen' && l2_state !== 'pro_3') return;
             if(type === 'chr' && l2_state !== 'meta') return;
@@ -373,18 +339,15 @@
             if(type === 'cleavage' && l2_state !== 'telo') return;
 
             if(e.type === 'touchstart') e.preventDefault();
-
             dragCtx.el = el; dragCtx.isDragging = true;
             let pos = getEventPos(e);
             dragCtx.startX = pos.clientX; dragCtx.startY = pos.clientY;
-            dragCtx.origLeft = parseFloat(el.style.left) || 50;
-            dragCtx.origTop = parseFloat(el.style.top) || 50;
+            dragCtx.origLeft = parseFloat(el.style.left) || 50; dragCtx.origTop = parseFloat(el.style.top) || 50;
         }
 
         function handleDragMove(e) {
             if(!dragCtx.isDragging || !dragCtx.el) return;
             if(e.type === 'touchmove') e.preventDefault();
-
             let pos = getEventPos(e);
             const rect = mitosisBox.getBoundingClientRect();
             let dx = ((pos.clientX - dragCtx.startX) / rect.width) * 100;
@@ -395,7 +358,6 @@
                 if(dragCtx.el.id === 'cleavage-top') newTop = Math.max(-5, Math.min(45, newTop));
                 if(dragCtx.el.id === 'cleavage-bottom') newTop = Math.max(55, Math.min(105, newTop));
                 dragCtx.el.style.top = newTop + '%';
-
                 let tTop = parseFloat(document.getElementById('cleavage-top').style.top) || -5;
                 let bTop = parseFloat(document.getElementById('cleavage-bottom').style.top) || 105;
                 let distance = bTop - tTop;
@@ -403,23 +365,19 @@
                 mitosisBox.style.borderRadius = `${radiusX}px / 50%`;
                 return;
             }
-
-            dragCtx.el.style.left = (dragCtx.origLeft + dx) + '%';
-            dragCtx.el.style.top = (dragCtx.origTop + dy) + '%';
+            dragCtx.el.style.left = (dragCtx.origLeft + dx) + '%'; dragCtx.el.style.top = (dragCtx.origTop + dy) + '%';
         }
 
         function handleDragEnd(e) {
             if(!dragCtx.isDragging || !dragCtx.el) return;
-            let el = dragCtx.el;
-            dragCtx.isDragging = false; dragCtx.el = null;
-
+            let el = dragCtx.el; dragCtx.isDragging = false; dragCtx.el = null;
             let x = parseFloat(el.style.left), y = parseFloat(el.style.top);
 
             if(l2_state === 'pro_3' && el.dataset.type === 'cen') {
                 if(x < 20) { el.style.left = '10%'; el.style.top = '50%'; el.dataset.ready = '1'; }
                 else if(x > 80) { el.style.left = '90%'; el.style.top = '50%'; el.dataset.ready = '1'; }
                 else {
-                    showAIError("中心体位置偏移！必须移向细胞的左右对称两极。");
+                    showAIError("错误操作：中心体位置偏移！\n生理要求：必须移向细胞的左右对称两极。", "L2");
                     el.style.left = dragCtx.origLeft + '%'; el.style.top = dragCtx.origTop + '%';
                 }
 
@@ -427,9 +385,9 @@
                 if(c1.dataset.ready === '1' && c2.dataset.ready === '1') {
                     if(c1.style.left === c2.style.left) {
                         c1.dataset.ready='0'; c2.dataset.ready='0';
-                        showAIError("两个中心体处于同极！将导致无法形成对称纺锤体。");
+                        showAIError("错误操作：两个中心体处于同极！\n生理后果：将导致无法形成对称纺锤体。", "L2");
                     } else {
-                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 请分别点击两极中心体，生成星射线。</div>`;
+                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 请分别点击两极中心体，生成纺锤体。</div>`;
                     }
                 }
             }
@@ -441,23 +399,23 @@
                     for(let c of chrs) {
                         if(c.id !== el.id && c.dataset.locked === '1' && Math.abs(parseFloat(c.style.left) - x) < 12) {
                             el.dataset.locked = '0'; el.style.top = dragCtx.origTop + '%';
-                            return showAIError("染色体发生堆叠！中期染色体必须单独、均匀地排列在赤道板上。");
+                            return showAIError("错误操作：染色体发生堆叠！\n生理要求：中期染色体必须单独、均匀地排列在赤道板上。", "L2");
                         }
                     }
                 } else {
                     el.dataset.locked = '0';
-                    showAIError("着丝粒偏移！需精准对齐细胞中央的赤道板。");
+                    showAIError("错误操作：着丝粒偏移！\n生理要求：需精准对齐细胞中央的赤道板。", "L2");
                 }
                 if(document.querySelectorAll('.chromosome[data-locked="1"]').length === 4) {
                     l2_state = 'ana_click';
-                    document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 后期：请点击染色体中央的着丝粒使其分裂。</div>`;
+                    document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 后期：请点击染色体中央使其分裂。</div>`;
                 }
             }
 
             if(l2_state === 'ana_drag' && el.dataset.type === 'chrm') {
                 if(x < 30) { el.style.left = '20%'; el.dataset.locked = '1'; }
                 else if(x > 70) { el.style.left = '80%'; el.dataset.locked = '1'; }
-                else { el.dataset.locked = '0'; showAIError("牵拉力度不足，未到达两极！"); }
+                else { el.dataset.locked = '0'; showAIError("错误操作：牵拉力度不足，未到达两极！", "L2"); }
 
                 let lockedList = document.querySelectorAll('.chromatid[data-locked="1"]');
                 if(lockedList.length === 8) {
@@ -465,15 +423,13 @@
                     lockedList.forEach(c => { if(parseFloat(c.style.left) < 50) leftC++; else rightC++; });
                     if(leftC === 4 && rightC === 4) {
                         l2_state = 'telo';
-                        document.getElementById('equator').style.display = 'none';
-                        document.getElementById('spindle-svg').style.opacity = 0;
-                        document.getElementById('cleavage-top').style.display = 'block';
-                        document.getElementById('cleavage-bottom').style.display = 'block';
+                        document.getElementById('equator').style.display = 'none'; document.getElementById('spindle-svg').style.opacity = 0;
+                        document.getElementById('cleavage-top').style.display = 'block'; document.getElementById('cleavage-bottom').style.display = 'block';
                         document.getElementById('cleavage-top').style.top = '-5%'; document.getElementById('cleavage-bottom').style.top = '105%';
-                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 末期：拖拽上下把手，将细胞膜向内对称缢裂。</div>`;
+                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 末期：拖拽上下把手向内对称缢裂。</div>`;
                     } else {
                         document.querySelectorAll('.chromatid').forEach(c => c.dataset.locked = '0');
-                        showAIError("两极染色体数量不均等！子细胞将发生染色体数目变异。");
+                        showAIError("错误操作：两极染色体数量不均等！\n生理后果：子细胞将发生染色体数目变异（非整倍体）。", "L2");
                     }
                 }
             }
@@ -483,7 +439,7 @@
                 let bTop = parseFloat(document.getElementById('cleavage-bottom').style.top) || 105;
 
                 if(Math.abs(Math.abs(tTop - 50) - Math.abs(bTop - 50)) > 20) {
-                    showAIError("细胞膜缢裂严重偏心！动物细胞分裂必须从正中间向内对称缢裂。");
+                    showAIError("错误操作：细胞膜缢裂严重偏心！\n生理要求：动物细胞分裂必须从正中间向内对称缢裂。", "L2");
                     document.getElementById('cleavage-top').style.top = '-5%'; document.getElementById('cleavage-bottom').style.top = '105%';
                     mitosisBox.style.borderRadius = '50%';
                     return;
@@ -493,38 +449,30 @@
                     document.getElementById('cleavage-top').style.display = 'none'; document.getElementById('cleavage-bottom').style.display = 'none';
                     mitosisBox.style.borderRadius = '120px / 50px'; mitosisBox.style.width = '320px';
                     document.getElementById('pole-left').style.display = 'block'; document.getElementById('pole-right').style.display = 'block';
-                    document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 最后一步：点击左右两极区域，重建细胞核。</div>`;
+                    document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 最后一步：点击左右两极区域重建细胞核。</div>`;
                 }
             }
         }
 
-        document.addEventListener('mousedown', handleDragStart);
-        document.addEventListener('touchstart', handleDragStart, {passive: false});
-        document.addEventListener('mousemove', handleDragMove);
-        document.addEventListener('touchmove', handleDragMove, {passive: false});
-        document.addEventListener('mouseup', handleDragEnd);
-        document.addEventListener('touchend', handleDragEnd);
+        document.addEventListener('mousedown', handleDragStart); document.addEventListener('touchstart', handleDragStart, {passive: false});
+        document.addEventListener('mousemove', handleDragMove); document.addEventListener('touchmove', handleDragMove, {passive: false});
+        document.addEventListener('mouseup', handleDragEnd); document.addEventListener('touchend', handleDragEnd);
 
         document.getElementById('nucleus').onclick = () => {
             if(l2_state === 'pro_1') {
-                document.getElementById('nucleus').style.opacity = 0;
-                setTimeout(() => document.getElementById('nucleus').style.display = 'none', 1200);
-                l2_state = 'pro_2';
-                document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 前期 (第2步)：点击细胞内散开的染色质。</div>`;
-            } else { showAIError("核膜已解体。"); }
+                document.getElementById('nucleus').style.opacity = 0; setTimeout(() => document.getElementById('nucleus').style.display = 'none', 1200); l2_state = 'pro_2';
+                document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">第二步：点击细胞质内的丝状染色质。</div>`;
+            } else { showAIError("核膜已解体。", "L2"); }
         };
 
         document.getElementById('chromatin').onclick = () => {
             if(l2_state === 'pro_2') {
                 let chr = document.getElementById('chromatin');
                 chr.style.transform = 'translate(-50%, -50%) scale(0.2)'; chr.style.opacity = 0;
-                setTimeout(() => {
-                    chr.style.display = 'none';
-                    document.querySelectorAll('.chromosome').forEach(c => c.style.display = 'block');
-                }, 1500);
+                setTimeout(() => { chr.style.display = 'none'; document.querySelectorAll('.chromosome').forEach(c => c.style.display = 'block'); }, 1500);
                 l2_state = 'pro_3';
-                document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 前期 (第3步)：将中心体拖至左右两极。</div>`;
-            } else if (l2_state === 'pro_1') { showAIError("未解体核膜直接点击！染色质被核膜包裹无法散开。"); }
+                document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">第三步：将两个中心体拖至左右两极。</div>`;
+            } else if (l2_state === 'pro_1') { showAIError("操作错误：未解体核膜直接操作染色质！\n生理后果：核膜碎片会严重干扰纺锤体形成。", "L2"); }
         };
 
         let spindleClick = 0;
@@ -534,16 +482,8 @@
                     cen.dataset.ready = '2'; spindleClick++;
                     if(spindleClick === 2) {
                         let svg = document.getElementById('spindle-svg');
-                        svg.innerHTML = `
-                            <line x1="10%" y1="50%" x2="90%" y2="50%" class="spindle-line" />
-                            <line x1="10%" y1="50%" x2="50%" y2="25%" class="spindle-line" />
-                            <line x1="10%" y1="50%" x2="50%" y2="75%" class="spindle-line" />
-                            <line x1="90%" y1="50%" x2="50%" y2="25%" class="spindle-line" />
-                            <line x1="90%" y1="50%" x2="50%" y2="75%" class="spindle-line" />
-                        `;
-                        svg.style.opacity = 1;
-                        document.getElementById('equator').style.display = 'block';
-                        l2_state = 'meta';
+                        svg.innerHTML = `<line x1="10%" y1="50%" x2="90%" y2="50%" class="spindle-line" /><line x1="10%" y1="50%" x2="50%" y2="25%" class="spindle-line" /><line x1="10%" y1="50%" x2="50%" y2="75%" class="spindle-line" /><line x1="90%" y1="50%" x2="50%" y2="25%" class="spindle-line" /><line x1="90%" y1="50%" x2="50%" y2="75%" class="spindle-line" />`;
+                        svg.style.opacity = 1; document.getElementById('equator').style.display = 'block'; l2_state = 'meta';
                         document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 中期：拖拽染色体，对齐赤道板。</div>`;
                     }
                 }
@@ -556,15 +496,14 @@
                 if(l2_state === 'ana_click') {
                     chr.style.display = 'none';
                     let pair = chr.id.replace('chr', '');
-                    let l = document.getElementById('chrm' + pair + '_l');
-                    let r = document.getElementById('chrm' + pair + '_r');
+                    let l = document.getElementById('chrm' + pair + '_l'), r = document.getElementById('chrm' + pair + '_r');
                     let top = parseFloat(chr.style.top), left = parseFloat(chr.style.left);
                     l.style.top = top + '%'; l.style.left = (left-5) + '%'; l.style.display = 'block';
                     r.style.top = top + '%'; r.style.left = (left+5) + '%'; r.style.display = 'block';
                     splitCount++;
                     if(splitCount === 4) {
                         l2_state = 'ana_drag';
-                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 后期：拖动分离的染色单体，均匀分向两极。</div>`;
+                        document.getElementById('controls-area').innerHTML = `<div style="background:var(--glass-bg); padding:10px 15px; border-radius:15px; font-size:13px; font-weight:bold;">🔬 后期：拖动分离的染色单体向两极。</div>`;
                     }
                 }
             }
@@ -584,13 +523,184 @@
                     if(pole.id==='pole-left' && parseFloat(c.style.left)<50) c.style.opacity = 0;
                     if(pole.id==='pole-right' && parseFloat(c.style.left)>50) c.style.opacity = 0;
                 });
-
                 poleClicks++;
-                if(poleClicks === 2) {
-                    showSuccess("完全正确！亲子代细胞遗传物质实现均等分配。");
-                }
+                if(poleClicks === 2) { setProgress(40); showSuccess("有丝分裂完成！遗传物质实现了均分。"); }
             }
         });
+
+        // ================= 第3关：基因表达 =================
+        function initL3() {
+            document.getElementById('controls-area').innerHTML = `
+                <div class="gene-panel" id="genes">
+                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">呼吸酶基因</div></label>
+                    <label><input type="checkbox" class="custom-cb" value="i"><div class="cb-label">肌动蛋白</div></label>
+                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">ATP合成酶</div></label>
+                    <label><input type="checkbox" class="custom-cb" value="l"><div class="cb-label">血红蛋白基因</div></label>
+                    <label><input type="checkbox" class="custom-cb" value="h"><div class="cb-label">核糖体蛋白</div></label>
+                    <label><input type="checkbox" class="custom-cb" value="l"><div class="cb-label">血红素合成</div></label>
+                </div><button class="btn-primary" onclick="checkL3()" style="margin-top:10px;">执行分化</button>`;
+        }
+        function checkL3() {
+            let h=0, l=0, i=0;
+            document.querySelectorAll('#genes input:checked').forEach(cb => { if(cb.value=='h')h++; if(cb.value=='l')l++; if(cb.value=='i')i++; });
+            if(h==3 && l==2 && i==0) {
+                document.getElementById('diff-cell').innerText = "成熟红细胞(无核)";
+                document.getElementById('diff-cell').style.background = 'radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b)';
+                document.getElementById('diff-cell').style.boxShadow = 'inset 0 0 40px #922b21';
+                showSuccess("特化成功！管家基因维持生命，奢侈基因实现红细胞特有功能。");
+            } else {
+                document.querySelectorAll('#genes input').forEach(cb => cb.checked = false);
+                if(h<3) showAIError("操作错误：遗漏管家基因！\n导致细胞无法维持基本生命活动而死亡。", "L3");
+                else if(i>0) showAIError("操作错误：误选无关干扰基因！\n导致细胞发生异常分化。", "L3");
+                else showAIError("操作错误：未充分表达红细胞的奢侈基因。", "L3");
+            }
+        }
+
+        // ================= 第4关：韦恩图分类 =================
+        function dropToZone(ev) {
+            ev.preventDefault();
+            ev.currentTarget.appendChild(document.getElementById(ev.dataTransfer.getData("text")));
+        }
+
+        function initL4() {
+            document.getElementById('controls-area').innerHTML = `
+                <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px; max-width:800px;" id="l4cards">
+                    <div class="feature-card" id="f1" draggable="true" ondragstart="drag(event)">1. 水分减少，细胞萎缩</div>
+                    <div class="feature-card" id="f2" draggable="true" ondragstart="drag(event)">2. 酶活性降低，代谢慢</div>
+                    <div class="feature-card" id="f3" draggable="true" ondragstart="drag(event)">3. 细胞膜通透性改变</div>
+                    <div class="feature-card" id="f4" draggable="true" ondragstart="drag(event)">4. 细胞核大/核膜内折</div>
+                    <div class="feature-card" id="f5" draggable="true" ondragstart="drag(event)">5. 遗传物质不稳</div>
+                    <div class="feature-card" id="f6" draggable="true" ondragstart="drag(event)">6. 细胞内色素积累</div>
+                    <div class="feature-card" id="f7" draggable="true" ondragstart="drag(event)">7. 携氧减弱</div>
+                </div>
+                <button class="btn-primary" onclick="checkL4()" style="margin-top:5px;">验证分类</button>`;
+
+            document.getElementById('circle-rbc').style.borderRadius = "50%";
+        }
+
+        function checkL4() {
+            let stemOnlyIds = Array.from(document.getElementById('zone-stem-only').querySelectorAll('.feature-card')).map(e=>e.id);
+            let commonIds = Array.from(document.getElementById('zone-common').querySelectorAll('.feature-card')).map(e=>e.id);
+            let rbcOnlyIds = Array.from(document.getElementById('zone-rbc-only').querySelectorAll('.feature-card')).map(e=>e.id);
+
+            let allPlaced = stemOnlyIds.length + commonIds.length + rbcOnlyIds.length === 7;
+            if(!allPlaced) { showAIError("请将所有 7 张特征卡片分类至对应的韦恩图区域。", "L4"); return; }
+
+            let isCommonOK = commonIds.includes('f1') && commonIds.includes('f2') && commonIds.includes('f3') && commonIds.length === 3;
+            let isStemOnlyOK = stemOnlyIds.includes('f4') && stemOnlyIds.includes('f5') && stemOnlyIds.includes('f6') && stemOnlyIds.length === 3;
+            let isRbcOnlyOK = rbcOnlyIds.includes('f7') && rbcOnlyIds.length === 1;
+
+            if(isCommonOK && isStemOnlyOK && isRbcOnlyOK) {
+                document.getElementById('circle-rbc').style.borderRadius = "40% 60% 70% 30% / 40% 50% 60% 50%";
+                setProgress(80);
+                showSuccess("分类完全正确！<br>共性：水分少、代谢慢、膜改变。<br>个性：有核细胞涉及细胞核及遗传物质改变，红细胞主要涉及特定功能蛋白（血红蛋白）衰退。");
+            } else {
+                initL4();
+                let msg = "分类错误！\nAI 解析：";
+                if(rbcOnlyIds.includes('f4') || rbcOnlyIds.includes('f5') || rbcOnlyIds.includes('f6') || commonIds.includes('f4') || commonIds.includes('f5') || commonIds.includes('f6')) {
+                    msg += "成熟红细胞无细胞核，因此不可能存在核膜内折或遗传物质不稳定等特征。";
+                } else if(stemOnlyIds.includes('f7') || commonIds.includes('f7')) {
+                    msg += "造血干细胞尚未分化，并不表达血红蛋白基因，不存在携氧能力。";
+                } else {
+                    msg += "请仔细辨别哪些是所有细胞衰老的共性特征（如水分、酶活性、细胞膜通透性），哪些是基于特有结构的个性特征。";
+                }
+                showAIError(msg, "L4");
+            }
+        }
+
+        // ================= 第5关：滑块 =================
+        let ca=false, cb=false;
+        function initL5() {
+            document.getElementById('controls-area').innerHTML = `<div class="slider-panel"><div class="slider-row"><label class="slider-label">内部凋亡基因表达 <span id="v1" class="val-badge">低</span></label><input type="range" id="g-slider" min="0" max="100" value="0" oninput="updL5()"></div><div class="slider-row"><label class="slider-label">外界环境不利压力 <span id="v2" class="val-badge">弱</span></label><input type="range" id="e-slider" min="0" max="100" value="0" oninput="updL5()"></div></div><button onclick="initL5()" style="margin-top:10px; padding:8px; border:none; background:rgba(0,0,0,0.05); border-radius:8px;">↺ 重置</button>`;
+            document.getElementById('death-cell').style = "width:180px; height:180px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); transition:all 1s; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold;";
+            document.getElementById('death-suspense').style.display='none';
+        }
+        function updL5() {
+            let g = parseInt(document.getElementById('g-slider').value), e = parseInt(document.getElementById('e-slider').value);
+            let c = document.getElementById('death-cell');
+            document.getElementById('v1').innerText = g>50?"高":"低"; document.getElementById('v2').innerText = e>50?"强（病菌/外伤）":"弱（良好）";
+            document.getElementById('death-suspense').style.display='none';
+
+            if(e<50 && g>50) {
+                c.style.transform="scale(0.1)"; c.style.opacity=0; setTimeout(()=>showAIError("【AI 解读】生理性凋亡：红细胞碎片化并被吞噬，维持稳态。"),100); ca=true;
+            } else if(e<50 && g<=50) {
+                c.style.transform="scale(1)"; c.style.opacity=1; document.getElementById('death-suspense').style.display='block';
+            } else if(e>=50 && g>50) {
+                c.style.transform="scale(1.1)"; c.style.background="#555"; setTimeout(()=>showAIError("【AI 解读】凋亡突然破裂：正常的凋亡通路被强烈的外界胁迫强行中断。", "L5"),100);
+            } else if(e>=50 && g<=50) {
+                c.style.transform="scale(1.6)"; c.style.opacity=0; setTimeout(()=>showAIError("【AI 解读】外界损伤引发瞬时破裂坏死：未能启动凋亡机制，强外力导致细胞非正常死亡，引发炎症。", "L5"),100); cb=true;
+            }
+            if(ca && cb) { setTimeout(() => { generateFinalReport(); }, 2000); }
+        }
+
+        // ================= 终局检测报告与多样称号系统 =================
+        function generateFinalReport() {
+            setProgress(100);
+            let totalErrors = errors.L1 + errors.L2 + errors.L3 + errors.L4 + errors.L5;
+
+            let title = "【合格的生命运输者】";
+            let titleColor = "#1976d2";
+            let desc = "你平稳地完成了生命使命，虽然偶有波折，但最终成为了机体需要的一份子。";
+
+            // 多样化称号判定
+            if (totalErrors === 0) {
+                title = "【完美·造血干细胞】";
+                titleColor = "#2e7d32";
+                desc = "无懈可击！你是生命工程的奇迹，每一次生理决策都完美无瑕。";
+            } else if (errors.L2 > 0) {
+                title = "【特殊染色体拥有者】";
+                titleColor = "#d32f2f";
+                desc = "在有丝分裂中，你有错误移动染色体行为，意外创造了独特的染色体格局。";
+            } else if (errors.L3 > 0) {
+                title = "【基因表达叛逆者】";
+                titleColor = "#7b1fa2";
+                desc = "在细胞分化阶段，你不满足于平凡的归宿，试图挑战基因的权威。";
+            } else if (errors.L4 > 0) {
+                title = "【结构形态混淆师】";
+                titleColor = "#455a64";
+                desc = "面对衰老，你对细胞结构与衰老特征的关系产生了认知偏差。";
+            } else if (errors.L5 > 0) {
+                title = "【凋亡路径探索家】";
+                titleColor = "#5d4037";
+                desc = "在生命的终点，你尝试了所有非正常的谢幕方式。";
+            } else if (errors.L1 > 0) {
+                title = "【发育迟缓的缺陷体】";
+                titleColor = "#ffa000";
+                desc = "分裂间期的仓促与时序颠倒，让你的生命从开始就带着瑕疵。";
+            }
+
+            // 动态错题摘要
+            let report = "";
+            if(errors.L1 > 0) report += "<li style='margin-bottom:8px;'><strong>分裂间期：</strong>G₁期、S期、G₂期顺序极其严格，时序颠倒会导致缺乏所需酶类，DNA复制异常。</li>";
+            if(errors.L2 > 0) report += "<li style='margin-bottom:8px;'><strong>有丝分裂：</strong>核膜需先解体、中心体就位才能形成有效纺锤体。后期着丝粒分裂后，单体必须均等分向两极，否则引发染色体数目变异。</li>";
+            if(errors.L3 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞分化：</strong>在保证管家基因维持生存的基础上，必须准确表达奢侈基因才能完成细胞功能特化。</li>";
+            if(errors.L4 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞衰老：</strong>衰老特征依细胞结构而定。成熟红细胞因无细胞核，不具备核膜内折特征；核心衰老表现为血红蛋白携氧能力减弱。</li>";
+            if(errors.L5 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞死亡：</strong>正常凋亡是受基因控制的主动过程；被外界强行打断或直接过度损伤引发的属于细胞坏死。</li>";
+
+            if(report === "") report = "<li>🎉 完美通关！在完整的细胞生命周期体验中，你未触发任何知识点盲区，展现了深厚的生物学功底。</li>";
+
+            document.querySelectorAll('.level-container').forEach(el => el.classList.remove('active'));
+            document.getElementById('prompt-text').innerText = "探索结束，请查收你的生命历程分析报告。";
+            document.getElementById('footer').style.display = 'none';
+
+            const panel = document.getElementById('report-panel');
+            panel.style.display = 'block';
+            panel.innerHTML = `
+                <h1 style="color:var(--primary); margin-bottom:10px; font-size:24px;">🧬 探究完成</h1>
+                <h2 style="color:${titleColor}; margin-bottom:10px;">荣获称号：${title}</h2>
+                <p style="margin-bottom:20px; font-style:italic; color:#666;">${desc}</p>
+                <div style="text-align:left; background:white; padding:20px; border-radius:10px; box-shadow:inset 0 0 10px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom:15px; border-bottom:2px solid #eee; padding-bottom:8px; display:flex; align-items:center; gap:8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        错题监测与知识点摘要
+                    </h3>
+                    <ul style="line-height:1.6; color:#444; padding-left:20px; font-size:14px;">
+                        ${report}
+                    </ul>
+                </div>
+                <button class="btn-primary" style="margin-top:25px;" onclick="location.reload()">重新体验生命旅程</button>
+            `;
+        }
 
         initLevel();
     </script>
