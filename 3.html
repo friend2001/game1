@@ -219,7 +219,7 @@
     <script>
         // ================== 全局核心机制与错题记录 ==================
         let currentLevel = 1;
-        // 使用整数记录各关卡错题次数，用于最终称号判定
+        // 使用整数记录各关卡错题次数，修复全局变量名
         let errorStats = { L1: 0, L2: 0, L3: 0, L4: 0, L5: 0 };
 
         const prompts = [
@@ -565,13 +565,13 @@
         function initL4() {
             document.getElementById('controls-area').innerHTML = `
                 <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px; max-width:800px;" id="l4cards">
-                    <div class="feature-card" id="f1" draggable="true" ondragstart="drag(event)">1. 水分减少，细胞萎缩</div>
-                    <div class="feature-card" id="f2" draggable="true" ondragstart="drag(event)">2. 酶活性降低，代谢慢</div>
+                    <div class="feature-card" id="f1" draggable="true" ondragstart="drag(event)">1. 细胞水分减少，细胞萎缩</div>
+                    <div class="feature-card" id="f2" draggable="true" ondragstart="drag(event)">2. 酶活性降低，代谢减慢</div>
                     <div class="feature-card" id="f3" draggable="true" ondragstart="drag(event)">3. 细胞膜通透性改变</div>
-                    <div class="feature-card" id="f4" draggable="true" ondragstart="drag(event)">4. 细胞核大/核膜内折</div>
-                    <div class="feature-card" id="f5" draggable="true" ondragstart="drag(event)">5. 遗传物质不稳</div>
+                    <div class="feature-card" id="f4" draggable="true" ondragstart="drag(event)">4. 细胞核体积增大、核膜内折</div>
+                    <div class="feature-card" id="f5" draggable="true" ondragstart="drag(event)">5. 遗传物质稳定性下降</div>
                     <div class="feature-card" id="f6" draggable="true" ondragstart="drag(event)">6. 细胞内色素积累</div>
-                    <div class="feature-card" id="f7" draggable="true" ondragstart="drag(event)">7. 携氧减弱</div>
+                    <div class="feature-card" id="f7" draggable="true" ondragstart="drag(event)">7. 血红蛋白活性下降，携氧减弱</div>
                 </div>
                 <button class="btn-primary" onclick="checkL4()" style="margin-top:5px;">验证分类</button>`;
 
@@ -611,24 +611,24 @@
         // ================= 第5关：滑块 =================
         let ca=false, cb=false;
         function initL5() {
-            document.getElementById('controls-area').innerHTML = `<div class="slider-panel"><div class="slider-row"><label class="slider-label">内部凋亡基因表达 <span id="v1" class="val-badge">低</span></label><input type="range" id="g-slider" min="0" max="100" value="0" oninput="updL5()"></div><div class="slider-row"><label class="slider-label">外界环境不利压力 <span id="v2" class="val-badge">弱</span></label><input type="range" id="e-slider" min="0" max="100" value="0" oninput="updL5()"></div></div><button onclick="initL5()" style="margin-top:10px; padding:8px; border:none; background:rgba(0,0,0,0.05); border-radius:8px;">↺ 重置</button>`;
+            document.getElementById('controls-area').innerHTML = `<div class="slider-panel"><div class="slider-row"><label class="slider-label">内部凋亡基因表达 <span id="v1" class="val-badge">低</span></label><input type="range" id="g-slider" min="0" max="100" value="0" oninput="updL5()"></div><div class="slider-row"><label class="slider-label">外界环境不利压力 <span id="v2" class="val-badge">弱</span></label><input type="range" id="e-slider" min="0" max="100" value="0" oninput="updL5()"></div></div><button onclick="initL5()" style="margin-top:10px; padding:8px; border:none; background:rgba(0,0,0,0.05); border-radius:8px;">↺ 重置滑块</button>`;
             document.getElementById('death-cell').style = "width:180px; height:180px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b); transition:all 1s; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold;";
             document.getElementById('death-suspense').style.display='none';
         }
         function updL5() {
             let g = parseInt(document.getElementById('g-slider').value), e = parseInt(document.getElementById('e-slider').value);
             let c = document.getElementById('death-cell');
-            document.getElementById('v1').innerText = g>50?"高":"低"; document.getElementById('v2').innerText = e>50?"强（病菌/外伤）":"弱（良好）";
+            document.getElementById('v1').innerText = g>50?"高":"低"; document.getElementById('v2').innerText = e>50?"强（病菌/外伤）":"弱（环境良好）";
             document.getElementById('death-suspense').style.display='none';
 
             if(e<50 && g>50) {
-                c.style.transform="scale(0.1)"; c.style.opacity=0; setTimeout(()=>showAIError("【AI 解读】生理性凋亡：红细胞碎片化并被吞噬，维持稳态。"),100); ca=true;
+                c.style.transform="scale(0.1)"; c.style.opacity=0; setTimeout(()=>showAIError("【AI 解读】基因程序性生理性凋亡：红细胞缓慢碎片化并被吞噬，维持机体稳态。"),100); ca=true;
             } else if(e<50 && g<=50) {
                 c.style.transform="scale(1)"; c.style.opacity=1; document.getElementById('death-suspense').style.display='block';
             } else if(e>=50 && g>50) {
-                c.style.transform="scale(1.1)"; c.style.background="#555"; setTimeout(()=>showAIError("【AI 解读】凋亡突然破裂：正常的凋亡通路被强烈的外界胁迫强行中断。", "L5"),100);
+                c.style.transform="scale(1.1)"; c.style.background="#555"; setTimeout(()=>showAIError("【AI 解读】凋亡中途突然破裂：正常的凋亡通路被强烈的外界胁迫强行中断。", "L5"),100);
             } else if(e>=50 && g<=50) {
-                c.style.transform="scale(1.6)"; c.style.opacity=0; setTimeout(()=>showAIError("【AI 解读】外界损伤引发瞬时破裂坏死：未能启动凋亡机制，强外力导致细胞非正常死亡，引发炎症。", "L5"),100); cb=true;
+                c.style.transform="scale(1.6)"; c.style.opacity=0; setTimeout(()=>showAIError("【AI 解读】外界损伤引发瞬时破裂坏死：由于未能启动凋亡机制，强外力导致细胞非正常死亡，引发炎症。", "L5"),100); cb=true;
             }
             if(ca && cb) { setTimeout(() => { generateFinalReport(); }, 2000); }
         }
@@ -636,7 +636,7 @@
         // ================= 终局检测报告与多样称号系统 =================
         function generateFinalReport() {
             setProgress(100);
-            let totalErrors = errors.L1 + errors.L2 + errors.L3 + errors.L4 + errors.L5;
+            let totalErrors = errorStats.L1 + errorStats.L2 + errorStats.L3 + errorStats.L4 + errorStats.L5;
 
             let title = "【合格的生命运输者】";
             let titleColor = "#1976d2";
@@ -647,23 +647,23 @@
                 title = "【完美·造血干细胞】";
                 titleColor = "#2e7d32";
                 desc = "无懈可击！你是生命工程的奇迹，每一次生理决策都完美无瑕。";
-            } else if (errors.L2 > 0) {
+            } else if (errorStats.L2 > 0) {
                 title = "【特殊染色体拥有者】";
                 titleColor = "#d32f2f";
                 desc = "在有丝分裂中，你有错误移动染色体行为，意外创造了独特的染色体格局。";
-            } else if (errors.L3 > 0) {
+            } else if (errorStats.L3 > 0) {
                 title = "【基因表达叛逆者】";
                 titleColor = "#7b1fa2";
                 desc = "在细胞分化阶段，你不满足于平凡的归宿，试图挑战基因的权威。";
-            } else if (errors.L4 > 0) {
+            } else if (errorStats.L4 > 0) {
                 title = "【结构形态混淆师】";
                 titleColor = "#455a64";
                 desc = "面对衰老，你对细胞结构与衰老特征的关系产生了认知偏差。";
-            } else if (errors.L5 > 0) {
+            } else if (errorStats.L5 > 0) {
                 title = "【凋亡路径探索家】";
                 titleColor = "#5d4037";
                 desc = "在生命的终点，你尝试了所有非正常的谢幕方式。";
-            } else if (errors.L1 > 0) {
+            } else if (errorStats.L1 > 0) {
                 title = "【发育迟缓的缺陷体】";
                 titleColor = "#ffa000";
                 desc = "分裂间期的仓促与时序颠倒，让你的生命从开始就带着瑕疵。";
@@ -671,11 +671,11 @@
 
             // 动态错题摘要
             let report = "";
-            if(errors.L1 > 0) report += "<li style='margin-bottom:8px;'><strong>分裂间期：</strong>G₁期、S期、G₂期顺序极其严格，时序颠倒会导致缺乏所需酶类，DNA复制异常。</li>";
-            if(errors.L2 > 0) report += "<li style='margin-bottom:8px;'><strong>有丝分裂：</strong>核膜需先解体、中心体就位才能形成有效纺锤体。后期着丝粒分裂后，单体必须均等分向两极，否则引发染色体数目变异。</li>";
-            if(errors.L3 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞分化：</strong>在保证管家基因维持生存的基础上，必须准确表达奢侈基因才能完成细胞功能特化。</li>";
-            if(errors.L4 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞衰老：</strong>衰老特征依细胞结构而定。成熟红细胞因无细胞核，不具备核膜内折特征；核心衰老表现为血红蛋白携氧能力减弱。</li>";
-            if(errors.L5 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞死亡：</strong>正常凋亡是受基因控制的主动过程；被外界强行打断或直接过度损伤引发的属于细胞坏死。</li>";
+            if(errorStats.L1 > 0) report += "<li style='margin-bottom:8px;'><strong>分裂间期：</strong>G₁期、S期、G₂期顺序极其严格，时序颠倒会导致缺乏所需酶类，DNA复制异常。</li>";
+            if(errorStats.L2 > 0) report += "<li style='margin-bottom:8px;'><strong>有丝分裂：</strong>核膜需先解体、中心体就位才能形成有效纺锤体。后期着丝粒分裂后，单体必须均等分向两极，否则引发染色体数目变异。</li>";
+            if(errorStats.L3 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞分化：</strong>在保证管家基因维持生存的基础上，必须准确表达奢侈基因才能完成细胞功能特化。</li>";
+            if(errorStats.L4 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞衰老：</strong>衰老特征依细胞结构而定。成熟红细胞因无细胞核，不具备核膜内折特征；核心衰老表现为血红蛋白携氧能力减弱。</li>";
+            if(errorStats.L5 > 0) report += "<li style='margin-bottom:8px;'><strong>细胞死亡：</strong>正常凋亡是受基因控制的主动过程；被外界强行打断或直接过度损伤引发的属于细胞坏死。</li>";
 
             if(report === "") report = "<li>🎉 完美通关！在完整的细胞生命周期体验中，你未触发任何知识点盲区，展现了深厚的生物学功底。</li>";
 
